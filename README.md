@@ -6,7 +6,7 @@ This is a reinforcement learning AI model build to play teh GameBoy game Metroid
 2. Install correct python version Python: 3.10.13
     * if using anaconda you can run these commands in terminal
     ```
-    conda create --name metroid ai python=3.10.13
+    conda create --name metroidai python=3.10.13
     conda activate metroidai
     ```
     * you can also use pyenv or just insall python 3.10.13 to your machine
