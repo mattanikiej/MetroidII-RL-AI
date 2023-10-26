@@ -1,3 +1,4 @@
 gymnasium==0.29.1
 numpy==1.26.1
 pyboy==1.6.4
+stable_baselines3==2.1.0

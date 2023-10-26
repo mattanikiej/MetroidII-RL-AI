@@ -1,6 +1,3 @@
-# std libs
-import random
-
 # data/ math libs
 import numpy as np
 
@@ -27,13 +24,14 @@ class MetroidGymEnv(Env):
         """
         # check a config was passed in
         if config is None:
-            raise Exception("Config needs to be set for MetroidGymEnv")
+            raise Exception("Config needs to be set for MetroidGymEnv. Check basic_config.py for structure")
         
         # load in config values
         self.action_frequency = config['action_frequency']
         self.initial_state = config['initial_state']
         self.rom_path = config['rom_path']
         self.seed = config['seed']
+        self.max_steps = config['max_steps']
 
         # initialize movement
         self.valid_actions = [
@@ -71,7 +69,7 @@ class MetroidGymEnv(Env):
         self.reward_range = (0, 15000)
         self.observation_space = spaces.Box(low=0, high=255, shape=(144, 160, 3), dtype=np.uint8)
 
-        # set rewards
+        # rewards are initialized during self.update_rewards() in self.reset()
         self.rewards = {
             'health_pickup': 0,
             'missle_pickup': 0,
@@ -98,6 +96,8 @@ class MetroidGymEnv(Env):
         self.previous_beam_upgrade = 0
         self.previous_metroids_remaining = 0
         self.deaths = 0
+
+        self.steps_taken = 0
             
         # start the game from initial state
         self.reset()
@@ -119,7 +119,13 @@ class MetroidGymEnv(Env):
         self.act(action)
         game_pixels = self.render()
 
-        return game_pixels, 0, False, False, {}
+        reward_gain = self.update_rewards()
+
+        self.steps_taken += 1
+
+        terminated = self.check_if_done()
+
+        return game_pixels, reward_gain, terminated, False, {}
 
 
     def reset(self, seed=None):
@@ -135,6 +141,7 @@ class MetroidGymEnv(Env):
         :return: (ObsType), (dict)
         """
         self.seed = seed
+        self.steps_taken = 0
 
         with open(self.initial_state, "rb") as f:
             self.pyboy.load_state(f)
@@ -145,7 +152,6 @@ class MetroidGymEnv(Env):
         self.previous_armor_upgrade = self.read_memory(mem.CURRENT_ARMOR_UPGRADE)
         self.previous_beam_upgrade = self.read_memory(mem.CURRENT_BEAM_UPGRADE)
         self.previous_metroids_remaining = self.read_memory(mem.GLOBAL_METROIDS_REMAINING)
-        self.deaths = 0
 
         self.update_rewards()
 
@@ -176,7 +182,6 @@ class MetroidGymEnv(Env):
         self.pyboy.stop()
 
 
-
     def act(self, action):
         """
         Sends the given action to the emulator
@@ -200,10 +205,44 @@ class MetroidGymEnv(Env):
                 select_pressed = False
                 self.pyboy.send_input(WindowEvent.RELEASE_BUTTON_SELECT)
 
+            # check hp to see if game needs to be reset
+            if self.samus_is_dead():
+                print("loading state")
+                self.deaths += 1
+                with open(self.initial_state, "rb") as f:
+                    self.pyboy.load_state(f)
 
-    def update_rewards(self):
+                # reset rewards
+                self.previous_health = self.read_memory(mem.CURRENT_HP)
+                self.previous_missles = self.read_memory(mem.CURRENT_MISSLES)
+                self.previous_armor_upgrade = self.read_memory(mem.CURRENT_ARMOR_UPGRADE)
+                self.previous_beam_upgrade = self.read_memory(mem.CURRENT_BEAM_UPGRADE)
+                self.previous_metroids_remaining = self.read_memory(mem.GLOBAL_METROIDS_REMAINING)
+
+                self.update_rewards(reset=True)
+
+
+    def samus_is_dead(self):
         """
-        Updates all of the rewards in the dictionary
+        Checks if Samus' hp is 0 and the game has reset
+
+        :return: (bool)
+        """
+        dead = False
+        health = self.pyboy.get_memory_value(mem.CURRENT_HP)
+        if health <= 0:
+            dead = True
+        return dead
+
+
+    def update_rewards(self, reset=False):
+        """
+        Updates all of the rewards and returns the net reward gain
+
+        :param reset (bool): If this is being called during reset, 
+                             it takes the death into accoutn during the difference
+
+        :return: (int)
         """
         self.rewards = {
             'health_pickup': self.get_health_pickup_reward(),
@@ -214,8 +253,20 @@ class MetroidGymEnv(Env):
             'deaths': self.get_deaths_reward()
         }
 
+        state_rewards = 0
         for reward in self.rewards:
-            self.total_reward += self.reward_weights[reward] * self.rewards[reward]
+            state_rewards += self.reward_weights[reward] * self.rewards[reward]
+
+        reward_difference = state_rewards - self.total_reward
+        self.total_reward = state_rewards
+
+        # get total reward with one less death
+        # punishes dying without resetting gain/ loss of other rewards
+        if reset:
+            self.total_reward -= self.rewards['deaths'] * self.reward_weights['deaths']
+            self.total_reward += (self.rewards['deaths']+1) * self.reward_weights['deaths']
+
+        return reward_difference
 
 
     def get_health_pickup_reward(self):
@@ -284,7 +335,7 @@ class MetroidGymEnv(Env):
 
         :return: (int)
         """
-        return self.deaths
+        return -self.deaths
 
 
     def read_memory(self, address):
@@ -297,4 +348,11 @@ class MetroidGymEnv(Env):
         """
         return self.pyboy.get_memory_value(address)
 
+
+    def check_if_done(self):
+        done = False
+        if self.steps_taken >= self.max_steps:
+            print("MAX STEPS TAKEN")
+            done = True
+        return done
         
