@@ -11,7 +11,14 @@ from gymnasium import Env, spaces
 from pyboy import PyBoy
 from pyboy.utils import WindowEvent
 
+# src
+import memory_constants as mem
+
+
 class MetroidGymEnv(Env):
+    """
+    Gymasium environment to be used by the model
+    """
     def __init__(self, config=None):
         """
         Constructor for MetroidGymEnv
@@ -61,9 +68,36 @@ class MetroidGymEnv(Env):
 
         # set gym attributes
         self.action_space = spaces.Discrete(len(self.valid_actions))
-        # self.metadata = {"render.modes": []}
         self.reward_range = (0, 15000)
         self.observation_space = spaces.Box(low=0, high=255, shape=(144, 160, 3), dtype=np.uint8)
+
+        # set rewards
+        self.rewards = {
+            'health_pickup': 0,
+            'missle_pickup': 0,
+            'armor_upgrade': 0,
+            'beam_upgrade': 0,
+            'metroids_remaining': 0,
+            'deaths': 0
+        }
+
+        self.reward_weights = {
+            'health_pickup': 1,
+            'missle_pickup': 1,
+            'armor_upgrade': 1,
+            'beam_upgrade': 1,
+            'metroids_remaining': 1,
+            'deaths': 1
+        }
+
+        self.total_reward = 0
+
+        self.previous_health = 0
+        self.previous_missles = 0
+        self.previous_armor_upgrade = 0
+        self.previous_beam_upgrade = 0
+        self.previous_metroids_remaining = 0
+        self.deaths = 0
             
         # start the game from initial state
         self.reset()
@@ -83,8 +117,9 @@ class MetroidGymEnv(Env):
         :return: (ObsType), (SupportsFloat), (bool), (bool), (dict)
         """
         self.act(action)
+        game_pixels = self.render()
 
-        return self.observation_space, 0, False, False, {}
+        return game_pixels, 0, False, False, {}
 
 
     def reset(self, seed=None):
@@ -103,6 +138,16 @@ class MetroidGymEnv(Env):
 
         with open(self.initial_state, "rb") as f:
             self.pyboy.load_state(f)
+
+        # reset rewards
+        self.previous_health = self.read_memory(mem.CURRENT_HP)
+        self.previous_missles = self.read_memory(mem.CURRENT_MISSLES)
+        self.previous_armor_upgrade = self.read_memory(mem.CURRENT_ARMOR_UPGRADE)
+        self.previous_beam_upgrade = self.read_memory(mem.CURRENT_BEAM_UPGRADE)
+        self.previous_metroids_remaining = self.read_memory(mem.GLOBAL_METROIDS_REMAINING)
+        self.deaths = 0
+
+        self.update_rewards()
 
         return self.render(), {}
 
@@ -128,7 +173,7 @@ class MetroidGymEnv(Env):
 
         https://gymnasium.farama.org/api/env/
         """
-        self.pyboy.close()
+        self.pyboy.stop()
 
 
 
@@ -154,5 +199,102 @@ class MetroidGymEnv(Env):
             if select_pressed:
                 select_pressed = False
                 self.pyboy.send_input(WindowEvent.RELEASE_BUTTON_SELECT)
+
+
+    def update_rewards(self):
+        """
+        Updates all of the rewards in the dictionary
+        """
+        self.rewards = {
+            'health_pickup': self.get_health_pickup_reward(),
+            'missle_pickup': self.get_missle_pickup_reward(),
+            'armor_upgrade': self.get_armor_upgrade_reward(),
+            'beam_upgrade': self.get_beam_upgrade_reward(),
+            'metroids_remaining': self.get_metroids_remaining_reward(),
+            'deaths': self.get_deaths_reward()
+        }
+
+        for reward in self.rewards:
+            self.total_reward += self.reward_weights[reward] * self.rewards[reward]
+
+
+    def get_health_pickup_reward(self):
+        """
+        Checks memory and returns the current health of Samus
+
+        :return: (int)
+        """
+        curr_health = self.read_memory(mem.CURRENT_HP)
+        reward = curr_health - self.previous_health
+        return reward
+
+
+    def get_missle_pickup_reward(self):
+        """
+        Checks memory and returns the difference of missles
+
+        :return: (int)
+        """
+        curr_missles = self.read_memory(mem.CURRENT_MISSLES)
+        reward = curr_missles - self.previous_missles
+
+        # don't punish ai for using missles
+        if reward < 0:
+            reward = 0
+
+        return reward
+
+
+    def get_armor_upgrade_reward(self):
+        """
+        Checks memory and returns the armor reward
+
+        :return: (int)
+        """
+        curr_armor = self.read_memory(mem.CURRENT_ARMOR_UPGRADE)
+        reward = curr_armor - self.previous_armor_upgrade
+        return reward
+
+
+    def get_beam_upgrade_reward(self):
+        """
+        Checks memory and returns the beam reward
+
+        :return: (int)
+        """
+        curr_beam = self.read_memory(mem.CURRENT_BEAM_UPGRADE)
+        reward = curr_beam - self.previous_beam_upgrade
+        return reward
+
+
+    def get_metroids_remaining_reward(self):
+        """
+        Check memory and return the metroids reward
+
+        :return: (int)
+        """
+        curr_metroids = self.read_memory(mem.GLOBAL_METROIDS_REMAINING)
+        reward = self.previous_metroids_remaining - curr_metroids
+        return reward
+
+
+    def get_deaths_reward(self):
+        """
+        Gets the amount of times the ai has dies. Wrapper for self.deaths
+
+        :return: (int)
+        """
+        return self.deaths
+
+
+    def read_memory(self, address):
+        """
+        Gets the value at the given address and returns it
+
+        :param address (hex): memory address to check
+
+        :return: (int)
+        """
+        return self.pyboy.get_memory_value(address)
 
         
