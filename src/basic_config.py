@@ -4,5 +4,5 @@ config = {
     "initial_state": "../states/post_start_screen.state",
     "rom_path": "../ROMs/Metroid2.gb",
     "seed": None,
-    "max_steps": 50
+    "max_steps": 5000
 }

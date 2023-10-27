@@ -60,7 +60,7 @@ class MetroidGymEnv(Env):
         self.last_pressed = None
 
         # load in the emulator and game
-        self.pyboy = PyBoy(self.rom_path)
+        self.pyboy = PyBoy(self.rom_path, window_type=False)
 
         self.screen = self.pyboy.botsupport_manager().screen()
 
