@@ -60,7 +60,7 @@ class MetroidGymEnv(Env):
         self.last_pressed = None
 
         # load in the emulator and game
-        self.pyboy = PyBoy(self.rom_path, window_type=False)
+        self.pyboy = PyBoy(self.rom_path)
 
         self.screen = self.pyboy.botsupport_manager().screen()
 
@@ -82,9 +82,9 @@ class MetroidGymEnv(Env):
         self.reward_weights = {
             'health_pickup': 1,
             'missle_pickup': 1,
-            'armor_upgrade': 1,
-            'beam_upgrade': 1,
-            'metroids_remaining': 1,
+            'armor_upgrade': 2,
+            'beam_upgrade': 2,
+            'metroids_remaining': 4,
             'deaths': 1
         }
 
@@ -355,4 +355,3 @@ class MetroidGymEnv(Env):
             print("MAX STEPS TAKEN")
             done = True
         return done
-        
