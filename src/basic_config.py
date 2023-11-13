@@ -7,5 +7,6 @@ config = {
                "../states/post_start_screen.state"],
     "rom_path": "../ROMs/Metroid2.gb",
     "seed": None,
-    "max_steps": 100
+    "max_steps": 10000,
+    "window": False
 }

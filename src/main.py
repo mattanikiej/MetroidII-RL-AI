@@ -1,4 +1,3 @@
-from random import randint
 from pathlib import Path
 import uuid
 
@@ -45,7 +44,7 @@ if __name__ == '__main__':
     # check_env(env)
 
     # establish callbacks
-    enable_callbacks = False
+    enable_callbacks = True
     callbacks = []
 
     if enable_callbacks:
@@ -60,9 +59,10 @@ if __name__ == '__main__':
     # https://stable-baselines3.readthedocs.io/en/master/modules/ppo.html
     model = PPO('CnnPolicy', env, verbose=1, batch_size=n_steps, n_steps=n_steps*n_envs)
 
-    learning_iters = 2
-    for _ in range(learning_iters):
-        model.learn(total_timesteps=n_steps, callback=callbacks)
+    learning_iters = 100
+    for i in range(learning_iters):
+        print(f'-----------------------iter {i}-----------------------')
+        model.learn(total_timesteps=n_steps*n_envs, callback=callbacks)
 
     # close environments
     env.close()

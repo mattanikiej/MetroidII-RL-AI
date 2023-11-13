@@ -34,6 +34,7 @@ class MetroidGymEnv(Env):
         self.rom_path = config['rom_path']
         self.seed = config['seed']
         self.max_steps = config['max_steps']
+        self.window_type = config['window']
 
         # initial state is initialized in self.reset()
         self.initial_state = None
@@ -65,7 +66,7 @@ class MetroidGymEnv(Env):
         self.last_pressed = None
 
         # load in the emulator and game
-        self.pyboy = PyBoy(self.rom_path)
+        self.pyboy = PyBoy(self.rom_path, window_type=self.window_type)
 
         self.screen = self.pyboy.botsupport_manager().screen()
 
@@ -288,7 +289,7 @@ class MetroidGymEnv(Env):
         reward = curr_health - self.previous_health
         # don't overly punish getting hit
         if reward < 0:
-            reward *= 0.05
+            reward *= 0.1
         return reward
 
 
@@ -364,7 +365,6 @@ class MetroidGymEnv(Env):
     def check_if_done(self):
         done = False
         if self.steps_taken >= self.max_steps:
-            print("MAX STEPS TAKEN")
             print(f"Total Rewards: {self.total_reward}")
             done = True
         return done
