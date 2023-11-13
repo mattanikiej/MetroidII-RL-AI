@@ -1,16 +1,12 @@
 from random import randint
 
-# data/ math libs
 import numpy as np
 
-# machine learning libs
 from gymnasium import Env, spaces
 
-# pyboy 
 from pyboy import PyBoy
 from pyboy.utils import WindowEvent
 
-# src
 import memory_constants as mem
 
 

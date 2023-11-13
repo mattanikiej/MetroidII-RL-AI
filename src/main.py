@@ -5,9 +5,8 @@ from metroid_env import MetroidGymEnv
 
 from stable_baselines3 import PPO
 
-import basic_config as bc
+import configs as c
 
-from stable_baselines3.common.env_checker import check_env
 from stable_baselines3.common.vec_env import SubprocVecEnv
 from stable_baselines3.common.utils import set_random_seed
 from stable_baselines3.common.callbacks import CheckpointCallback, CallbackList
@@ -33,15 +32,15 @@ def make_env(rank, config, seed=0):
 
 if __name__ == '__main__':
 
-    n_steps = bc.config["max_steps"]
+    cfg = c.basic
+    n_steps = cfg["max_steps"]
     n_envs = 4
 
     session_id = str(uuid.uuid4())[:8]
     session_path = Path(f'sessions/session_{session_id}')
     
     # create environment
-    env = SubprocVecEnv([make_env(i, bc.config) for i in range(n_envs)])
-    # check_env(env)
+    env = SubprocVecEnv([make_env(i, cfg) for i in range(n_envs)])
 
     # establish callbacks
     enable_callbacks = True
@@ -55,14 +54,12 @@ if __name__ == '__main__':
 
     callbacks = CallbackList(callbacks)
 
-    # rollout buffer size is n_steps * n_envs where n_envs is number of environment copies running in parallel
-    # https://stable-baselines3.readthedocs.io/en/master/modules/ppo.html
-    model = PPO('CnnPolicy', env, verbose=1, batch_size=n_steps, n_steps=n_steps*n_envs)
+    model = PPO('CnnPolicy', env, verbose=1, batch_size=128, n_steps=n_steps // 8, tensorboard_log=session_path)
 
-    learning_iters = 100
+    learning_iters = 50
     for i in range(learning_iters):
         print(f'-----------------------iter {i}-----------------------')
-        model.learn(total_timesteps=n_steps*n_envs, callback=callbacks)
+        model.learn(total_timesteps=n_steps*n_envs*1000, callback=callbacks)
 
     # close environments
     env.close()
