@@ -1,3 +1,5 @@
+from random import randint
+
 # data/ math libs
 import numpy as np
 
@@ -28,10 +30,13 @@ class MetroidGymEnv(Env):
         
         # load in config values
         self.action_frequency = config['action_frequency']
-        self.initial_state = config['initial_state']
+        self.states = config['states']
         self.rom_path = config['rom_path']
         self.seed = config['seed']
         self.max_steps = config['max_steps']
+
+        # initial state is initialized in self.reset()
+        self.initial_state = None
 
         # initialize movement
         self.valid_actions = [
@@ -143,7 +148,12 @@ class MetroidGymEnv(Env):
         self.seed = seed
         self.steps_taken = 0
 
-        with open(self.initial_state, "rb") as f:
+        # choose random start state
+        i = randint(0, len(self.states)-1)
+        state = self.states[i]
+        self.initial_state = state
+
+        with open(state, "rb") as f:
             self.pyboy.load_state(f)
 
         # reset rewards
@@ -207,7 +217,6 @@ class MetroidGymEnv(Env):
 
             # check hp to see if game needs to be reset
             if self.samus_is_dead():
-                print("loading state")
                 self.deaths += 1
                 with open(self.initial_state, "rb") as f:
                     self.pyboy.load_state(f)
@@ -277,6 +286,9 @@ class MetroidGymEnv(Env):
         """
         curr_health = self.read_memory(mem.CURRENT_HP)
         reward = curr_health - self.previous_health
+        # don't overly punish getting hit
+        if reward < 0:
+            reward *= 0.05
         return reward
 
 
@@ -353,5 +365,6 @@ class MetroidGymEnv(Env):
         done = False
         if self.steps_taken >= self.max_steps:
             print("MAX STEPS TAKEN")
+            print(f"Total Rewards: {self.total_reward}")
             done = True
         return done
