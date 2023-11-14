@@ -86,7 +86,7 @@ class MetroidGymEnv(Env):
             'missle_pickup': 3,
             'armor_upgrade': 5,
             'beam_upgrade': 5,
-            'metroids_remaining': 10,
+            'metroids_remaining': 50,
             'deaths': 1
         }
 
