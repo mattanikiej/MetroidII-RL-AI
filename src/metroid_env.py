@@ -285,7 +285,7 @@ class MetroidGymEnv(Env):
         reward = curr_health - self.previous_health
         # don't overly punish getting hit
         if reward < 0:
-            reward *= 0.1
+            reward *= 0.05
         return reward
 
 
