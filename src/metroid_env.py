@@ -68,7 +68,7 @@ class MetroidGymEnv(Env):
 
         # set gym attributes
         self.action_space = spaces.Discrete(len(self.valid_actions))
-        self.reward_range = (0, 15000)
+        self.reward_range = (-100, 15000)
         self.observation_space = spaces.Box(low=0, high=255, shape=(144, 160, 3), dtype=np.uint8)
 
         # rewards are initialized during self.update_rewards() in self.reset()
@@ -82,11 +82,11 @@ class MetroidGymEnv(Env):
         }
 
         self.reward_weights = {
-            'health_pickup': 1,
-            'missle_pickup': 1,
-            'armor_upgrade': 2,
-            'beam_upgrade': 2,
-            'metroids_remaining': 4,
+            'health_pickup': 3,
+            'missle_pickup': 3,
+            'armor_upgrade': 5,
+            'beam_upgrade': 5,
+            'metroids_remaining': 10,
             'deaths': 1
         }
 
