@@ -1,5 +1,5 @@
 from pathlib import Path
-import uuid
+from datetime import datetime
 
 from metroid_env import MetroidGymEnv
 
@@ -36,7 +36,7 @@ if __name__ == '__main__':
     n_steps = cfg["max_steps"]
     n_envs = 4
 
-    session_id = str(uuid.uuid4())[:8]
+    session_id = str(datetime.now()).replace(' ','_')
     session_path = Path(f'sessions/session_{session_id}')
     
     # create environment
@@ -56,7 +56,7 @@ if __name__ == '__main__':
 
     model = PPO('CnnPolicy', env, verbose=1, batch_size=128, n_steps=n_steps // 8, tensorboard_log=session_path)
 
-    learning_iters = 50
+    learning_iters = 30
     for i in range(learning_iters):
         print(f'-----------------------iter {i}-----------------------')
         model.learn(total_timesteps=n_steps*n_envs*1000, callback=callbacks)
