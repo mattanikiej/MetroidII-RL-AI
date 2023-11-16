@@ -19,13 +19,13 @@ short = {
                "../states/post_start_screen.state"],
     "rom_path": "../ROMs/Metroid2.gb",
     "seed": None,
-    "max_steps": 100,
+    "max_steps": 500,
     "window": 'headless'
 }
 
 replay = {
     "action_frequency": 5,
-    "states": ["../states/post_start_screen.state"],
+    "states": ["../states/past_first_door.state"],
     "rom_path": "../ROMs/Metroid2.gb",
     "seed": None,
     "max_steps": 1000,

@@ -78,16 +78,23 @@ class MetroidGymEnv(Env):
             'armor_upgrade': 0,
             'beam_upgrade': 0,
             'metroids_remaining': 0,
-            'deaths': 0
+            'enemies_killed': 0,
+
+            'deaths': 0,
+            'damage_taken': 0
         }
 
+        # weights are all > 0
         self.reward_weights = {
             'health_pickup': 3,
             'missle_pickup': 3,
             'armor_upgrade': 5,
             'beam_upgrade': 5,
             'metroids_remaining': 50,
-            'deaths': 1
+            'enemies_killed': 10,
+
+            'deaths': 1,
+            'damage_taken': 0.01
         }
 
         self.total_reward = 0
@@ -97,9 +104,15 @@ class MetroidGymEnv(Env):
         self.previous_armor_upgrade = 0
         self.previous_beam_upgrade = 0
         self.previous_metroids_remaining = 0
+        self.previous_sfx = 0
+
+        self.enemies_killed = 0
+
         self.deaths = 0
 
         self.steps_taken = 0
+
+        self.resets = -1
             
         # start the game from initial state
         self.reset()
@@ -142,6 +155,7 @@ class MetroidGymEnv(Env):
 
         :return: (ObsType), (dict)
         """
+        self.resets += 1
         self.seed = seed
         self.steps_taken = 0
 
@@ -159,6 +173,9 @@ class MetroidGymEnv(Env):
         self.previous_armor_upgrade = self.read_memory(mem.CURRENT_ARMOR_UPGRADE)
         self.previous_beam_upgrade = self.read_memory(mem.CURRENT_BEAM_UPGRADE)
         self.previous_metroids_remaining = self.read_memory(mem.GLOBAL_METROIDS_REMAINING)
+        self.previous_sfx = self.read_memory(mem.SFX_PLAYING)
+
+        self.enemies_killed = 0
 
         self.update_rewards()
 
@@ -212,20 +229,32 @@ class MetroidGymEnv(Env):
                 select_pressed = False
                 self.pyboy.send_input(WindowEvent.RELEASE_BUTTON_SELECT)
 
+            # check if enemy has died
+            if self.has_enemy_died():
+                self.enemies_killed += 1
+
             # check hp to see if game needs to be reset
             if self.samus_is_dead():
                 self.deaths += 1
-                with open(self.initial_state, "rb") as f:
-                    self.pyboy.load_state(f)
+                self.reset()
 
-                # reset rewards
-                self.previous_health = self.read_memory(mem.CURRENT_HP)
-                self.previous_missles = self.read_memory(mem.CURRENT_MISSLES)
-                self.previous_armor_upgrade = self.read_memory(mem.CURRENT_ARMOR_UPGRADE)
-                self.previous_beam_upgrade = self.read_memory(mem.CURRENT_BEAM_UPGRADE)
-                self.previous_metroids_remaining = self.read_memory(mem.GLOBAL_METROIDS_REMAINING)
 
-                self.update_rewards(reset=True)
+    def has_enemy_died(self):
+        """
+        Checks the memory to see if the enemy dying sfx started this frame.
+        Returns True if it has, False otherwise.
+        
+        :return: (bool)
+        """
+        enemy_died = False
+        sfx = self.read_memory(mem.SFX_PLAYING)
+        if sfx == mem.ENEMY_KILLED_SFX and sfx != self.previous_sfx:
+            enemy_died = True
+
+        # update previous frame sfx
+        self.previous_sfx = sfx
+
+        return enemy_died
 
 
     def samus_is_dead(self):
@@ -245,47 +274,43 @@ class MetroidGymEnv(Env):
         """
         Updates all of the rewards and returns the net reward gain
 
-        :param reset (bool): If this is being called during reset, 
-                             it takes the death into accoutn during the difference
-
         :return: (int)
         """
+        # all rewards are > 0 and all punishments are < 0
         self.rewards = {
             'health_pickup': self.get_health_pickup_reward(),
             'missle_pickup': self.get_missle_pickup_reward(),
             'armor_upgrade': self.get_armor_upgrade_reward(),
             'beam_upgrade': self.get_beam_upgrade_reward(),
             'metroids_remaining': self.get_metroids_remaining_reward(),
-            'deaths': self.get_deaths_reward()
+            'enemies_killed': self.get_enemies_killed_reward(),
+
+            'deaths': self.get_deaths_punishment(),
+            'damage_taken': self.get_damage_taken_punishment()
         }
 
-        state_rewards = 0
-        for reward in self.rewards:
-            state_rewards += self.reward_weights[reward] * self.rewards[reward]
+        state_reward = 0
+        for rwname in self.rewards:
+            reward = self.reward_weights[rwname] * self.rewards[rwname]
+            state_reward += reward
 
-        reward_difference = state_rewards - self.total_reward
-        self.total_reward = state_rewards
-
-        # get total reward with one less death
-        # punishes dying without resetting gain/ loss of other rewards
-        if reset:
-            self.total_reward -= self.rewards['deaths'] * self.reward_weights['deaths']
-            self.total_reward += (self.rewards['deaths']+1) * self.reward_weights['deaths']
+        reward_difference = state_reward - self.total_reward
+        self.total_reward = state_reward
 
         return reward_difference
 
 
     def get_health_pickup_reward(self):
         """
-        Checks memory and returns the current health of Samus
+        Checks memory and returns the positive health difference of Samus
 
         :return: (int)
         """
         curr_health = self.read_memory(mem.CURRENT_HP)
         reward = curr_health - self.previous_health
-        # don't overly punish getting hit
+
         if reward < 0:
-            reward *= 0.05
+            reward = 0
         return reward
 
 
@@ -336,15 +361,38 @@ class MetroidGymEnv(Env):
         curr_metroids = self.read_memory(mem.GLOBAL_METROIDS_REMAINING)
         reward = self.previous_metroids_remaining - curr_metroids
         return reward
+    
+    
+    def get_enemies_killed_reward(self):
+        """
+        Gets the amount of enemies killed by the ai. Wrapper for self.enemies_killed
+
+        :return: (int)
+        """
+        return self.enemies_killed
 
 
-    def get_deaths_reward(self):
+    def get_deaths_punishment(self):
         """
         Gets the amount of times the ai has dies. Wrapper for self.deaths
 
         :return: (int)
         """
         return -self.deaths
+
+
+    def get_damage_taken_punishment(self):
+        """
+        Checks memory and returns the negative health difference of Samus
+
+        :return: (int)
+        """
+        curr_health = self.read_memory(mem.CURRENT_HP)
+        reward = curr_health - self.previous_health
+   
+        if reward > 0:
+            reward = 0
+        return reward
 
 
     def read_memory(self, address):
