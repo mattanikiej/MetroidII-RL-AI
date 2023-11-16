@@ -1,8 +1,11 @@
+# IDE stuff
 __pycache__/*
 */__pycache__/*
 *.DS_Store
 
+# project folders
 ROMs/*
 */sessions/*
 
+# files
 */scratchpad.py
