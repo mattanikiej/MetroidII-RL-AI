@@ -3,7 +3,7 @@
 
 __This is a reinforcement learning artificial intelligence model built to play the GameBoy game, Metroid II: Return of Samus.__
 
-## Getting Started
+## 👾 Getting Started 👾
 1. Clone repo
 2. Install correct python version Python: 3.10.13
     * if using anaconda you can run these commands in terminal
@@ -20,7 +20,7 @@ pip install -r requirements.txt
 5. Legally obtain a Metroid II ROM and copy the .gb file into the ```ROMs/``` directory
     * You also have to rename the file to ```Metroid2.gb```
 
-## Run Pretrained Model
+## 🤖 Run Pretrained Model 🤖
 1. Enter ```src/``` directory
 ```
 cd src
@@ -32,7 +32,7 @@ python run_pretrained_model.py
 
 To run for longer increase max_iter in the ```replay``` config in ```configs.py```
 
-## Train Your Own AI
+## 🦾 Train Your Own AI 🦾
 
 1. Enter ```src/``` directory
 ```
@@ -49,14 +49,14 @@ Unless you have a very powerful computer, and A LOT (and I mean A LOT) of time, 
 * decrease ```learning_iters``` in ```main.py``` to reduce time
 * decrease ```n_envs``` in ```main.py``` to reduce cpu usage
 
-## Troubleshooting
+## 🔨 Troubleshooting 🔨
 If you have issues running the model for both the pretrained and/or training files, try these steps:
 * Make sure ffmpeg is installed
 * Make sure Python 3.10.13 is used
 * Make sure correct versions of libraries in requirements.txt are being used
 * Set ```n_envs = 1``` in ```main.py``` if you have issues with parallelizing the model
 
-## Built With
+## 💡 Built With 💡
 This AI couldn't have been done without these amazing projects. Please check them out and support them!
 
 ### [PyBoy](https://github.com/Baekalfen/PyBoy)
