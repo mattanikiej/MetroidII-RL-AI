@@ -1,5 +1,7 @@
 # METROID II: RETURN OF SAMUS AI
-<img src="/assets/logo.png" height="200"> <img src="/assets/boxart.jpg" height="200">
+<p align="center">
+    <img alt="Metroid II Logo" src="/assets/logo.png" height="200">
+</p>
 
 __This is a reinforcement learning artificial intelligence model built to play the GameBoy game, Metroid II: Return of Samus.__
 
@@ -61,15 +63,20 @@ This AI couldn't have been done without these amazing projects. Please check the
 
 ### [PyBoy](https://github.com/Baekalfen/PyBoy)
 <a href="https://github.com/Baekalfen/PyBoy">
-    <img src="/assets/pyboy-logo.png" alt="PyBoy Logo" height="100">
+    <img alt="PyBoy Logo" src="/assets/pyboy-logo.png" height="100">
 </a>
 
 ### [Stable Baselines 3](https://github.com/DLR-RM/stable-baselines3)
 <a href="https://github.com/DLR-RM/stable-baselines3">
-    <img src="/assets/stable-baselines-logo.png" height="100">
+    <img alt="Stable Baselines 3 Logo" src="/assets/stable-baselines-logo.png" height="100">
 </a>
 
 ### [Return Of Samus Disassembly](https://github.com/alex-west/M2RoS)
 <a href="https://github.com/alex-west/M2RoS">
-    <img src="/assets/m2-cartridge.jpeg" height="100">
+    <img alt="Metroid II Cartridge" src="/assets/m2-cartridge.jpeg" height="100">
 </a>
+
+# Thank You For Visiting
+<p align="center">
+    <img alt="Metroid II Box Art" src="/assets/boxart.jpg" height="200" >
+</p>
