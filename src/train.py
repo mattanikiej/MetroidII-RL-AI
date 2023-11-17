@@ -1,5 +1,5 @@
 from pathlib import Path
-from datetime import datetime
+from uuid import uuid4
 
 from metroid_env import MetroidGymEnv
 
@@ -9,7 +9,7 @@ import configs as c
 
 from stable_baselines3.common.vec_env import SubprocVecEnv
 from stable_baselines3.common.utils import set_random_seed
-from stable_baselines3.common.callbacks import CheckpointCallback, CallbackList
+from stable_baselines3.common.callbacks import CheckpointCallback, EvalCallback, CallbackList
 
 
 def make_env(rank, config, seed=0):
@@ -32,13 +32,14 @@ def make_env(rank, config, seed=0):
 
 if __name__ == '__main__':
 
-    cfg = c.basic
+    cfg = c.short
     n_steps = cfg["max_steps"]
-    n_envs = 4
+    n_envs = 6
 
-    session_id = str(datetime.now()).replace(' ','_')
+    session_id = str(uuid4())[:5]
     session_path = Path(f'sessions/session_{session_id}')
-    
+    tb_path = Path(f'sessions/session_{session_id}/tb')
+
     # create environment
     env = SubprocVecEnv([make_env(i, cfg) for i in range(n_envs)])
 
@@ -48,18 +49,17 @@ if __name__ == '__main__':
 
     if enable_callbacks:
         checkpoint_callback = CheckpointCallback(save_freq=n_steps, 
-                                                save_path=session_path, 
-                                                name_prefix='mai')
+                                                 save_path=session_path, 
+                                                 name_prefix='mai')
+
         callbacks.append(checkpoint_callback)
 
     callbacks = CallbackList(callbacks)
 
-    model = PPO('CnnPolicy', env, verbose=1, batch_size=128, n_steps=n_steps // 8, tensorboard_log=session_path+'/tb')
+    n_epochs = 10
+    model = PPO('CnnPolicy', env, verbose=1, n_epochs=n_epochs, batch_size=128, n_steps=n_steps // 8, tensorboard_log=tb_path)
 
-    learning_iters = 30
-    for i in range(learning_iters):
-        print(f'-----------------------iter {i}-----------------------')
-        model.learn(total_timesteps=n_steps*n_envs*10, callback=callbacks)
+    model.learn(total_timesteps=n_steps*n_envs*100, callback=callbacks)
 
     # close environments
     env.close()

@@ -7,8 +7,8 @@ basic = {
                "../states/post_start_screen.state"],
     "rom_path": "../ROMs/Metroid2.gb",
     "seed": None,
-    "max_steps": 16384,
-    "window": 'headless'
+    "max_steps": 32768,
+    "window": 'headless',
 }
 
 short = {
@@ -20,7 +20,7 @@ short = {
     "rom_path": "../ROMs/Metroid2.gb",
     "seed": None,
     "max_steps": 500,
-    "window": 'headless'
+    "window": 'headless',
 }
 
 replay = {
@@ -29,5 +29,5 @@ replay = {
     "rom_path": "../ROMs/Metroid2.gb",
     "seed": None,
     "max_steps": 5000,
-    "window": 'SDL2'
+    "window": 'SDL2',
 }

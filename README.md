@@ -40,23 +40,23 @@ To run for longer increase max_iter in the ```replay``` config in ```configs.py`
 ```
 cd src
 ```
-2. Run ```main.py``` file
+2. Run ```train.py``` file
 ```
-python main.py
+python train.py
 ```
 
 ### Tips For Training
 Unless you have a very powerful computer, and A LOT (and I mean A LOT) of time, I would reccomend the following changes:
 * decrease the max_iter field in the configuration you're using to reduce time
-* decrease ```learning_iters``` in ```main.py``` to reduce time
-* decrease ```n_envs``` in ```main.py``` to reduce cpu usage
+* decrease ```n_epochs``` in ```train.py``` to reduce time
+* decrease ```n_envs``` in ```train.py``` to reduce cpu usage
 
 ## 🔨 Troubleshooting 🔨
 If you have issues running the model for both the pretrained and/or training files, try these steps:
 * Make sure ffmpeg is installed
 * Make sure Python 3.10.13 is used
 * Make sure correct versions of libraries in requirements.txt are being used
-* Set ```n_envs = 1``` in ```main.py``` if you have issues with parallelizing the model
+* Set ```n_envs = 1``` in ```train.py``` if you have issues with parallelizing the model
 
 ## 💡 Built With 💡
 This AI couldn't have been done without these amazing projects. Please check them out and support them!

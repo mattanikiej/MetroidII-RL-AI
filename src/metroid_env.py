@@ -1,4 +1,5 @@
 from random import randint
+import csv
 
 import numpy as np
 
@@ -158,13 +159,15 @@ class MetroidGymEnv(Env):
         self.resets += 1
         self.seed = seed
         self.steps_taken = 0
+        self.total_reward = 0
 
-        # choose random start state
-        i = randint(0, len(self.states)-1)
-        state = self.states[i]
-        self.initial_state = state
+        # choose random start state only when env is initialized
+        if self.resets == 0:
+            i = randint(0, len(self.states)-1)
+            state = self.states[i]
+            self.initial_state = state
 
-        with open(state, "rb") as f:
+        with open(self.initial_state, "rb") as f:
             self.pyboy.load_state(f)
 
         # reset rewards
@@ -277,6 +280,7 @@ class MetroidGymEnv(Env):
         done = False
         if self.steps_taken >= self.max_steps:
             print(f"Total Rewards: {self.total_reward}")
+            
             done = True
         return done
 
@@ -296,8 +300,8 @@ class MetroidGymEnv(Env):
             'metroids_remaining': self.get_metroids_remaining_reward(),
             'enemies_killed': self.get_enemies_killed_reward(),
 
-            'deaths': self.get_deaths_punishment(),
-            'damage_taken': self.get_damage_taken_punishment()
+            # 'deaths': self.get_deaths_punishment(),
+            # 'damage_taken': self.get_damage_taken_punishment()
         }
 
         state_reward = 0
