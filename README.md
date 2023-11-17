@@ -77,7 +77,9 @@ This AI couldn't have been done without these amazing projects. Please check the
 </a>
 
 # Thanks for visiting! Continue the discussion in these awesome communities:
-![Discord Banner 2](https://discordapp.com/api/guilds/584149554132418570/widget.png?style=banner2) ![Discord Banner 2](https://discordapp.com/api/guilds/127475613073145858/widget.png?style=banner2)
+[![Discord Banner 2 PyBoy](https://discordapp.com/api/guilds/584149554132418570/widget.png?style=banner2)](https://discord.gg/bEMadYckBS)
+[![Discord Banner 2 Metconst](https://discordapp.com/api/guilds/127475613073145858/widget.png?style=banner2)](https://discord.gg/XnfmbNcSjr)
+
 
 <p align="center">
     <img alt="Metroid II Box Art" src="/assets/boxart.jpg" height="200" >
