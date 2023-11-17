@@ -373,7 +373,8 @@ class MetroidGymEnv(Env):
         curr_beam = self.read_memory(mem.CURRENT_BEAM_UPGRADE)
         
         reward = 0
-        if curr_beam != self.previous_beam_upgrade:
+        # check if beam is different, and not just switched to/from missiles
+        if curr_beam != self.previous_beam_upgrade and (curr_beam != 8 or self.previous_beam_upgrade != 8):
             reward = 1
 
         self.previous_beam_upgrade = curr_beam
