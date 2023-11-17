@@ -66,7 +66,13 @@ if __name__ == '__main__':
     callbacks = CallbackList(callbacks)
 
     n_epochs = 10
-    model = PPO('CnnPolicy', env, verbose=1, n_epochs=n_epochs, batch_size=128, n_steps=n_steps // 8, tensorboard_log=tb_path)
+    model = PPO('CnnPolicy', 
+                env, 
+                verbose=1, 
+                n_epochs=n_epochs, 
+                batch_size=128, 
+                n_steps=n_steps // 8, 
+                tensorboard_log=tb_path)
 
     model.learn(total_timesteps=n_steps*n_envs*100, callback=callbacks)
 

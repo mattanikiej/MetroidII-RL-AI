@@ -86,11 +86,11 @@ class MetroidGymEnv(Env):
 
         # weights are all > 0
         self.reward_weights = {
-            'health_pickup': 3,
-            'missile_pickup': 3,
-            'armor_upgrade': 5,
-            'beam_upgrade': 5,
-            'metroids_remaining': 50,
+            'health_pickup': 5,
+            'missile_pickup': 5,
+            'armor_upgrade': 20,
+            'beam_upgrade': 20,
+            'metroids_remaining': 100,
             'enemies_killed': 10,
 
             'deaths': 1,
