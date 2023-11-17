@@ -77,8 +77,9 @@ This AI couldn't have been done without these amazing projects. Please check the
 </a>
 
 # Thanks for visiting! Continue the discussion in these awesome communities:
-[![Discord Banner 2 PyBoy](https://discordapp.com/api/guilds/584149554132418570/widget.png?style=banner2)](https://discord.gg/bEMadYckBS)
-[![Discord Banner 2 Metconst](https://discordapp.com/api/guilds/127475613073145858/widget.png?style=banner2)](https://discord.gg/XnfmbNcSjr)
+[![Discord Banner 2 PyBoy](http://invidget.switchblade.xyz/bEMadYckBS)](https://discord.gg/bEMadYckBS) 
+[![Discord Banner 2 Metconst](http://invidget.switchblade.xyz/XnfmbNcSjr)](https://discord.gg/XnfmbNcSjr)
+[![Discord Banner 2 Reinforcement Learning](http://invidget.switchblade.xyz/pV8k2v6Fes)](https://discord.gg/pV8k2v6Fes)
 
 
 <p align="center">
