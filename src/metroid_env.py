@@ -159,7 +159,6 @@ class MetroidGymEnv(Env):
         self.resets += 1
         self.seed = seed
         self.steps_taken = 0
-        self.total_reward = 0
 
         # choose random start state only when env is initialized
         if self.resets == 0:
