@@ -8,6 +8,7 @@ from stable_baselines3 import PPO
 import configs as c
 
 from stable_baselines3.common.vec_env import SubprocVecEnv
+from stable_baselines3.common.vec_env import vec_transpose
 from stable_baselines3.common.utils import set_random_seed
 from stable_baselines3.common.callbacks import CheckpointCallback, EvalCallback, CallbackList
 
@@ -32,16 +33,18 @@ def make_env(rank, config, seed=0):
 
 if __name__ == '__main__':
 
-    cfg = c.short
+    cfg = c.basic
     n_steps = cfg["max_steps"]
     n_envs = 6
 
     session_id = str(uuid4())[:5]
     session_path = Path(f'sessions/session_{session_id}')
     tb_path = Path(f'sessions/session_{session_id}/tb')
+    best_model_path = Path(f'sessions/session_{session_id}/best_model')
 
     # create environment
     env = SubprocVecEnv([make_env(i, cfg) for i in range(n_envs)])
+    eval_env = vec_transpose.VecTransposeImage(env)
 
     # establish callbacks
     enable_callbacks = True
@@ -51,8 +54,14 @@ if __name__ == '__main__':
         checkpoint_callback = CheckpointCallback(save_freq=n_steps, 
                                                  save_path=session_path, 
                                                  name_prefix='mai')
+        
+        evaluation_callback = EvalCallback(eval_env, 
+                                           eval_freq=n_steps, 
+                                           log_path=session_path, 
+                                           best_model_save_path=best_model_path)
 
         callbacks.append(checkpoint_callback)
+        callbacks.append(evaluation_callback)
 
     callbacks = CallbackList(callbacks)
 
@@ -63,3 +72,4 @@ if __name__ == '__main__':
 
     # close environments
     env.close()
+    eval_env.close()
