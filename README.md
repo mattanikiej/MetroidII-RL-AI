@@ -1,5 +1,6 @@
 # METROID II: RETURN OF SAMUS AI
 <img src="/assets/logo.png" height="200"> <img src="/assets/boxart.jpg" height="200">
+
 __This is a reinforcement learning artificial intelligence model built to play the GameBoy game, Metroid II: Return of Samus.__
 
 ## Getting Started
