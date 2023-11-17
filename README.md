@@ -5,6 +5,10 @@
 
 __This is a reinforcement learning artificial intelligence model built to play the GameBoy game, Metroid II: Return of Samus.__
 
+## Checkout the YouTube video about the AI and the model breakdown
+<img alt="YouTube thumbnail" src="/assets/thumbnail.png" height="200">
+<img alt="YouTube breakdown thumbnail" src="/assets/tb_thumbnail.png" height="200">
+
 ## 👾 Getting Started 👾
 1. Clone repo
 2. Install correct python version Python: 3.10.13
