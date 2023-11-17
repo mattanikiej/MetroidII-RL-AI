@@ -1,7 +1,8 @@
 # METROID II: RETURN OF SAMUS AI
-This is a reinforcement learning AI model build to play teh GameBoy game Metroid II: Return of Samus
+<img src="/assets/logo.png" height="200"> <img src="/assets/boxart.jpg" height="200">
+__This is a reinforcement learning artificial intelligence model built to play the GameBoy game, Metroid II: Return of Samus.__
 
-## Build
+## Getting Started
 1. Clone repo
 2. Install correct python version Python: 3.10.13
     * if using anaconda you can run these commands in terminal
@@ -14,3 +15,60 @@ This is a reinforcement learning AI model build to play teh GameBoy game Metroid
 ```
 pip install -r requirements.txt
 ```
+4. Create a folder called ```ROMs``` in the root of the repository
+5. Legally obtain a Metroid II ROM and copy the .gb file into the ```ROMs/``` directory
+    * You also have to rename the file to ```Metroid2.gb```
+
+## Run Pretrained Model
+1. Enter ```src/``` directory
+```
+cd src
+```
+2. Run ```run_pretrained_model.py``` file
+```
+python run_pretrained_model.py
+```
+
+To run for longer increase max_iter in the ```replay``` config in ```configs.py```
+
+## Train Your Own AI
+
+1. Enter ```src/``` directory
+```
+cd src
+```
+2. Run ```main.py``` file
+```
+python main.py
+```
+
+### Tips For Training
+Unless you have a very powerful computer, and A LOT (and I mean A LOT) of time, I would reccomend the following changes:
+* decrease the max_iter field in the configuration you're using to reduce time
+* decrease ```learning_iters``` in ```main.py``` to reduce time
+* decrease ```n_envs``` in ```main.py``` to reduce cpu usage
+
+## Troubleshooting
+If you have issues running the model for both the pretrained and/or training files, try these steps:
+* Make sure ffmpeg is installed
+* Make sure Python 3.10.13 is used
+* Make sure correct versions of libraries in requirements.txt are being used
+* Set ```n_envs = 1``` in ```main.py``` if you have issues with parallelizing the model
+
+## Built With
+This AI couldn't have been done without these amazing projects. Please check them out and support them!
+
+### [PyBoy](https://github.com/Baekalfen/PyBoy)
+<a href="https://github.com/Baekalfen/PyBoy">
+    <img src="/assets/pyboy-logo.png" alt="PyBoy Logo" height="100">
+</a>
+
+### [Stable Baselines 3](https://github.com/DLR-RM/stable-baselines3)
+<a href="https://github.com/DLR-RM/stable-baselines3">
+    <img src="/assets/stable-baselines-logo.png" height="100">
+</a>
+
+### [Return Of Samus Disassembly](https://github.com/alex-west/M2RoS)
+<a href="https://github.com/alex-west/M2RoS">
+    <img src="/assets/m2-cartridge.jpeg" height="100">
+</a>

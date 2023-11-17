@@ -28,6 +28,6 @@ replay = {
     "states": ["../states/past_first_door.state"],
     "rom_path": "../ROMs/Metroid2.gb",
     "seed": None,
-    "max_steps": 1000,
+    "max_steps": 5000,
     "window": 'SDL2'
 }
