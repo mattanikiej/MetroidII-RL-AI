@@ -13,7 +13,7 @@ import memory_constants as mem
 
 class MetroidGymEnv(Env):
     """
-    Gymasium environment to be used by the model
+    Gymnasium environment to be used by the model
     """
     def __init__(self, config=None):
         """
