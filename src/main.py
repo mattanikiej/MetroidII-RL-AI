@@ -54,7 +54,7 @@ if __name__ == '__main__':
 
     callbacks = CallbackList(callbacks)
 
-    model = PPO('CnnPolicy', env, verbose=1, batch_size=128, n_steps=n_steps // 8, tensorboard_log=session_path)
+    model = PPO('CnnPolicy', env, verbose=1, batch_size=128, n_steps=n_steps // 8, tensorboard_log=session_path+'/tb')
 
     learning_iters = 30
     for i in range(learning_iters):
