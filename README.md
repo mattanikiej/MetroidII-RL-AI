@@ -76,7 +76,9 @@ This AI couldn't have been done without these amazing projects. Please check the
     <img alt="Metroid II Cartridge" src="/assets/m2-cartridge.jpeg" height="100">
 </a>
 
-# Thank You For Visiting
+# Thanks for visiting! Continue the discussion in these awesome communities:
+![Discord Banner 2](https://discordapp.com/api/guilds/584149554132418570/widget.png?style=banner2) ![Discord Banner 2](https://discordapp.com/api/guilds/127475613073145858/widget.png?style=banner2)
+
 <p align="center">
     <img alt="Metroid II Box Art" src="/assets/boxart.jpg" height="200" >
 </p>

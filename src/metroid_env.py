@@ -65,7 +65,6 @@ class MetroidGymEnv(Env):
         # load in the emulator and game
         self.pyboy = PyBoy(self.rom_path, window_type=self.window_type)
 
-        self.screen = self.pyboy.botsupport_manager().screen()
 
         # set gym attributes
         self.action_space = spaces.Discrete(len(self.valid_actions))
@@ -194,7 +193,8 @@ class MetroidGymEnv(Env):
         :return: (list[int])
         """
         # get screen pixels values
-        game_pixels = self.screen.screen_ndarray() # (144, 160, 3)
+        screen = self.pyboy.botsupport_manager().screen()
+        game_pixels = screen.screen_ndarray() # (144, 160, 3)
         return game_pixels
 
 
