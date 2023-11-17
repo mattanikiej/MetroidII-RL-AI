@@ -55,7 +55,7 @@ class MetroidGymEnv(Env):
             WindowEvent.RELEASE_BUTTON_A,
             WindowEvent.RELEASE_BUTTON_B,
 
-            # toggle missles
+            # toggle missiles
             WindowEvent.PRESS_BUTTON_SELECT
         ]
 
@@ -74,7 +74,7 @@ class MetroidGymEnv(Env):
         # rewards are initialized during self.update_rewards() in self.reset()
         self.rewards = {
             'health_pickup': 0,
-            'missle_pickup': 0,
+            'missile_pickup': 0,
             'armor_upgrade': 0,
             'beam_upgrade': 0,
             'metroids_remaining': 0,
@@ -87,20 +87,20 @@ class MetroidGymEnv(Env):
         # weights are all > 0
         self.reward_weights = {
             'health_pickup': 3,
-            'missle_pickup': 3,
+            'missile_pickup': 3,
             'armor_upgrade': 5,
             'beam_upgrade': 5,
             'metroids_remaining': 50,
             'enemies_killed': 10,
 
             'deaths': 1,
-            'damage_taken': 0.01
+            'damage_taken': 1
         }
 
         self.total_reward = 0
 
         self.previous_health = 0
-        self.previous_missles = 0
+        self.previous_missiles = 0
         self.previous_armor_upgrade = 0
         self.previous_beam_upgrade = 0
         self.previous_metroids_remaining = 0
@@ -169,7 +169,7 @@ class MetroidGymEnv(Env):
 
         # reset rewards
         self.previous_health = self.read_memory(mem.CURRENT_HP)
-        self.previous_missles = self.read_memory(mem.CURRENT_MISSLES)
+        self.previous_missiles = self.read_memory(mem.CURRENT_MISSILES)
         self.previous_armor_upgrade = self.read_memory(mem.CURRENT_ARMOR_UPGRADE)
         self.previous_beam_upgrade = self.read_memory(mem.CURRENT_BEAM_UPGRADE)
         self.previous_metroids_remaining = self.read_memory(mem.GLOBAL_METROIDS_REMAINING)
@@ -270,6 +270,17 @@ class MetroidGymEnv(Env):
         return dead
 
 
+    def check_if_done(self):
+        """
+        Check if the max number of steps has been reached
+        """
+        done = False
+        if self.steps_taken >= self.max_steps:
+            print(f"Total Rewards: {self.total_reward}")
+            done = True
+        return done
+
+
     def update_rewards(self, reset=False):
         """
         Updates all of the rewards and returns the net reward gain
@@ -279,7 +290,7 @@ class MetroidGymEnv(Env):
         # all rewards are > 0 and all punishments are < 0
         self.rewards = {
             'health_pickup': self.get_health_pickup_reward(),
-            'missle_pickup': self.get_missle_pickup_reward(),
+            'missile_pickup': self.get_missile_pickup_reward(),
             'armor_upgrade': self.get_armor_upgrade_reward(),
             'beam_upgrade': self.get_beam_upgrade_reward(),
             'metroids_remaining': self.get_metroids_remaining_reward(),
@@ -302,53 +313,67 @@ class MetroidGymEnv(Env):
 
     def get_health_pickup_reward(self):
         """
-        Checks memory and returns the positive health difference of Samus
-
+        Checks memory and returns 1 if there are more missiles
         :return: (int)
         """
         curr_health = self.read_memory(mem.CURRENT_HP)
-        reward = curr_health - self.previous_health
 
-        if reward < 0:
-            reward = 0
+        reward = 0
+        if curr_health > self.previous_health:
+            reward = 1
+
+        self.previous_health = curr_health
+
         return reward
 
 
-    def get_missle_pickup_reward(self):
+    def get_missile_pickup_reward(self):
         """
-        Checks memory and returns the difference of missles
-
+        Checks memory and returns 1 if there are more missiles
         :return: (int)
         """
-        curr_missles = self.read_memory(mem.CURRENT_MISSLES)
-        reward = curr_missles - self.previous_missles
+        curr_missiles = self.read_memory(mem.CURRENT_MISSILES)
 
-        # don't punish ai for using missles
-        if reward < 0:
-            reward = 0
+        reward = 0
+        if curr_missiles > self.previous_missiles:
+            reward = 1
+
+        self.previous_missiles = curr_missiles
 
         return reward
 
 
     def get_armor_upgrade_reward(self):
         """
-        Checks memory and returns the armor reward
+        Checks memory and returns the armor reward if new armor was obtained
 
         :return: (int)
         """
         curr_armor = self.read_memory(mem.CURRENT_ARMOR_UPGRADE)
-        reward = curr_armor - self.previous_armor_upgrade
+
+        reward = 0
+        if curr_armor != self.previous_armor_upgrade:
+            reward = 1
+
+        self.previous_armor_upgrade = curr_armor
+
         return reward
 
 
     def get_beam_upgrade_reward(self):
         """
-        Checks memory and returns the beam reward
+        Checks memory and returns the beam reward if new beam was obtained
 
         :return: (int)
         """
         curr_beam = self.read_memory(mem.CURRENT_BEAM_UPGRADE)
-        reward = curr_beam - self.previous_beam_upgrade
+        
+        reward = 0
+        if curr_beam != self.previous_beam_upgrade:
+            reward = 1
+
+        self.previous_beam_upgrade = curr_beam
+
         return reward
 
 
@@ -388,10 +413,13 @@ class MetroidGymEnv(Env):
         :return: (int)
         """
         curr_health = self.read_memory(mem.CURRENT_HP)
-        reward = curr_health - self.previous_health
-   
-        if reward > 0:
-            reward = 0
+
+        reward = 0
+        if curr_health < self.previous_health:
+            reward = 1
+
+        self.previous_health = curr_health
+
         return reward
 
 
@@ -404,11 +432,3 @@ class MetroidGymEnv(Env):
         :return: (int)
         """
         return self.pyboy.get_memory_value(address)
-
-
-    def check_if_done(self):
-        done = False
-        if self.steps_taken >= self.max_steps:
-            print(f"Total Rewards: {self.total_reward}")
-            done = True
-        return done

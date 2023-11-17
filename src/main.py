@@ -59,7 +59,7 @@ if __name__ == '__main__':
     learning_iters = 30
     for i in range(learning_iters):
         print(f'-----------------------iter {i}-----------------------')
-        model.learn(total_timesteps=n_steps*n_envs*1000, callback=callbacks)
+        model.learn(total_timesteps=n_steps*n_envs*10, callback=callbacks)
 
     # close environments
     env.close()
