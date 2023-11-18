@@ -27,13 +27,13 @@ if __name__ == "__main__":
 
     env = make_env(0, c.replay)()
 
-    file_name = 'sessions/session_a3340/best_model/best_model'
+    file_name = 'sessions/session_66a9d/best_model/best_model'
     model = PPO.load(file_name, env=env)
 
     obs, info = env.reset()
-    for i in range(1000):
+    while True:
 
-        action, _states = model.predict(obs, deterministic=False)
+        action, _states = model.predict(obs)
         obs, rewards, terminated, truncated, info = env.step(action)
         env.render()
 

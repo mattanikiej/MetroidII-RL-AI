@@ -42,6 +42,9 @@ if __name__ == '__main__':
     tb_path = Path(f'sessions/session_{session_id}/tb')
     best_model_path = Path(f'sessions/session_{session_id}/best_model')
 
+    if cfg["save_rewards"]:
+        cfg["save_path"] = f'sessions/session_{session_id}'
+
     # create environment
     env = SubprocVecEnv([make_env(i, cfg) for i in range(n_envs)])
     eval_env = vec_transpose.VecTransposeImage(env)
@@ -61,7 +64,7 @@ if __name__ == '__main__':
                                            best_model_save_path=best_model_path)
 
         callbacks.append(checkpoint_callback)
-        callbacks.append(evaluation_callback)
+        # callbacks.append(evaluation_callback)
 
     callbacks = CallbackList(callbacks)
 
@@ -74,7 +77,7 @@ if __name__ == '__main__':
                 n_steps=n_steps // 8, 
                 tensorboard_log=tb_path)
 
-    model.learn(total_timesteps=n_steps*n_envs*100, callback=callbacks)
+    model.learn(total_timesteps=n_steps*n_envs*1000, callback=callbacks)
 
     # close environments
     env.close()

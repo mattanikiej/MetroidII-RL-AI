@@ -1,6 +1,9 @@
 from random import randint
+from uuid import uuid4
+from pathlib import Path
 
 import numpy as np
+import pandas as pd
 
 from gymnasium import Env, spaces
 
@@ -31,6 +34,10 @@ class MetroidGymEnv(Env):
         self.seed = config['seed']
         self.max_steps = config['max_steps']
         self.window_type = config['window']
+        self.save_rewards = config['save_rewards']
+        self.save_path = None if not self.save_rewards else config['save_path']
+
+        self.id = str(uuid4())[:5]
 
         # initial state is initialized in self.reset()
         self.initial_state = None
@@ -80,23 +87,25 @@ class MetroidGymEnv(Env):
             'enemies_killed': 0,
             'exploration': 0,
 
-            'deaths': 0,
-            'damage_taken': 0
+            # 'deaths': 0,
+            # 'damage_taken': 0
         }
 
         # weights are all > 0
         self.reward_weights = {
-            'health_pickup': 5,
-            'missile_pickup': 5,
-            'armor_upgrade': 20,
-            'beam_upgrade': 20,
-            'metroids_remaining': 100,
-            'enemies_killed': 10,
-            'exploration': 0.01,
+            'health_pickup': 10,
+            'missile_pickup': 10,
+            'armor_upgrade': 50,
+            'beam_upgrade': 50,
+            'metroids_remaining': 200,
+            'enemies_killed': 30,
+            'exploration': 0.25,
 
-            'deaths': 1,
-            'damage_taken': 1
+            # 'deaths': 1,
+            # 'damage_taken': 1
         }
+        self.rewards_df = None if not self.save_rewards else pd.DataFrame(self.rewards, index=[0])
+        self.rewardw_df = None if not self.save_rewards else pd.DataFrame(self.reward_weights, index=[0])
 
         self.total_reward = 0
 
@@ -116,6 +125,9 @@ class MetroidGymEnv(Env):
         self.steps_taken = 0
 
         self.resets = -1
+
+        if self.save_rewards:
+            self.init_save_file()
             
         # start the game from initial state
         self.reset()
@@ -283,8 +295,39 @@ class MetroidGymEnv(Env):
         if self.steps_taken >= self.max_steps:
             print(f"Total Rewards: {self.total_reward}")
             
+            if self.save_rewards:
+
+                self.rewards_df = pd.DataFrame(self.rewards, index=[0])
+                self.rewardw_df = pd.DataFrame(self.reward_weights, index=[0])
+                
+                self.save_rewards_csv()
+
             done = True
         return done
+
+
+    def init_save_file(self):
+        """
+        Initialize csv file paths for the instance
+        """
+        # create the path
+        p = Path(self.save_path + f'/{self.id}')
+        p.mkdir(parents=True, exist_ok=True)
+
+        r = self.save_path + f'/{self.id}/rewards.csv.gz'
+        rw = self.save_path + f'/{self.id}/reward_weights.csv.gz'
+        self.save_path = (Path(r), Path(rw))
+
+        self.rewards_df.to_csv(self.save_path[0], compression='gzip', mode='a', index=False)
+        self.rewardw_df.to_csv(self.save_path[1], compression='gzip', mode='a', index=False)
+
+
+    def save_rewards_csv(self):
+        """
+        Saves reward info to csv
+        """
+        self.rewards_df.to_csv(self.save_path[0], compression='gzip', mode='a', header=False, index=False)
+        self.rewardw_df.to_csv(self.save_path[1], compression='gzip', mode='a', header=False, index=False)
 
 
     def update_rewards(self, reset=False):
@@ -415,25 +458,18 @@ class MetroidGymEnv(Env):
         reward = 0
 
         # get screen x and y coordinates
-        sx = self.read_memory(mem.PREV_SAMUS_SCREEN_X_PIXEL)
-        sy = self.read_memory(mem.PREV_SAMUS_SCREEN_Y_PIXEL)
-        screen_position = (sx, sy)
-
-        # get x and y coordinates
-        x = self.read_memory(mem.PREV_SAMUS_X_PIXEL)
-        y = self.read_memory(mem.PREV_SAMUS_Y_PIXEL)
-        samus_position = (x, y)
+        x = self.read_memory(mem.PREV_SAMUS_X_SCREEN)
+        y = self.read_memory(mem.PREV_SAMUS_Y_SCREEN)
 
         # check if this pixel has been explored
-        if screen_position in self.explored_coordinates:
-            if samus_position not in self.explored_coordinates[screen_position]:
-                self.explored_coordinates[screen_position].append(samus_position)        
+        if x in self.explored_coordinates:
+            self.explored_coordinates[x].add(y)        
         else:
-            self.explored_coordinates[screen_position] = [samus_position]
+            self.explored_coordinates[x] = set([y])
 
         # add all unique coordinates
-        for sp in self.explored_coordinates:
-            reward += len(self.explored_coordinates[sp])
+        for xc in self.explored_coordinates:
+            reward += len(self.explored_coordinates[xc])
 
         return reward
 

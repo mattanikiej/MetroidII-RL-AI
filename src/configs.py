@@ -9,7 +9,8 @@ basic = {
     "seed": None,
     "max_steps": 32768,
     "window": 'headless',
-    "n_envs": 6
+    "n_envs": 10,
+    "save_rewards": True
 }
 
 short = {
@@ -22,15 +23,17 @@ short = {
     "seed": None,
     "max_steps": 500,
     "window": 'SDL2',
-    "n_envs": 1
+    "n_envs": 1,
+    "save_rewards": True
 }
 
 replay = {
     "action_frequency": 5,
-    "states": ["../states/past_first_door.state"],
+    "states": ["../states/bottom_of_pit.state"],
     "rom_path": "../ROMs/Metroid2.gb",
     "seed": None,
     "max_steps": 5000,
     "window": 'SDL2',
-    "n_envs": 1
+    "n_envs": 1,
+    "save_rewards": False
 }

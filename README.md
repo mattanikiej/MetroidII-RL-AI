@@ -10,14 +10,15 @@ __This is a reinforcement learning artificial intelligence model built to play t
 
 
 ## 👾 Getting Started 👾
-1. Clone repo
-2. Install correct python version Python: 3.10.13
+1. Clone this repo
+2. Install correct python version: 3.10.13
     * if using anaconda you can run these commands in terminal
     ```
     conda create --name metroidai python=3.10.13
     conda activate metroidai
     ```
-    * you can also use pyenv or just insall python 3.10.13 to your machine
+    * you can also use pyenv, some other ython environment handler, or just insall python 3.10.13 to your machine
+    * This probably will work with python, but it hasn't been tested
 3. Open up the repo in terminal and run
 ```
 pip install -r requirements.txt
@@ -35,8 +36,7 @@ cd src
 ```
 python run_pretrained_model.py
 ```
-
-To run for longer increase max_iter in the ```replay``` config in ```configs.py```
+3. To stop the run, press ```CTRL + C``` in the terminal
 
 ## 🦾 Train Your Own AI 🦾
 
@@ -50,17 +50,18 @@ python train.py
 ```
 
 ### Tips For Training
-Unless you have a very powerful computer, and A LOT (and I mean A LOT) of time, I would reccomend the following changes:
-* decrease the max_iter field in the configuration you're using to reduce time
+Unless you have a very powerful computer, and A LOT (and I mean A LOT) of time, I would recommend the following changes:
+* decrease the ```max_iter``` field in the configuration you're using to reduce time
 * decrease ```n_envs``` in the configuration you're using to reduce cpu usage
 * decrease ```n_epochs``` in ```train.py``` to reduce time
 
 ## 🔨 Troubleshooting 🔨
 If you have issues running the model for both the pretrained and/or training files, try these steps:
+* make sure you are running ```train.py``` or ```run_pretrained_model.py``` from ```src/``` directory
+* Set ```n_envs = 1``` in ```train.py``` if you have issues with parallelizing the model
+* Make sure correct versions of libraries in requirements.txt are being used
 * Make sure ffmpeg is installed
 * Make sure Python 3.10.13 is used
-* Make sure correct versions of libraries in requirements.txt are being used
-* Set ```n_envs = 1``` in ```train.py``` if you have issues with parallelizing the model
 
 ## 💡 Built With 💡
 This AI couldn't have been done without these amazing projects. Please check them out and support them!
