@@ -104,6 +104,7 @@ class MetroidGymEnv(Env):
             # 'deaths': 1,
             # 'damage_taken': 1
         }
+        
         self.rewards_df = None if not self.save_rewards else pd.DataFrame(self.rewards, index=[0])
         self.rewardw_df = None if not self.save_rewards else pd.DataFrame(self.reward_weights, index=[0])
 
@@ -298,7 +299,6 @@ class MetroidGymEnv(Env):
             if self.save_rewards:
 
                 self.rewards_df = pd.DataFrame(self.rewards, index=[0])
-                self.rewardw_df = pd.DataFrame(self.reward_weights, index=[0])
                 
                 self.save_rewards_csv()
 
@@ -326,9 +326,12 @@ class MetroidGymEnv(Env):
         """
         Saves reward info to csv
         """
-        self.rewards_df.to_csv(self.save_path[0], compression='gzip', mode='a', header=False, index=False)
-        self.rewardw_df.to_csv(self.save_path[1], compression='gzip', mode='a', header=False, index=False)
-
+        self.rewards_df.to_csv(self.save_path[0], 
+                               compression='gzip', 
+                               mode='a', 
+                               header=False, 
+                               index=False)
+        
 
     def update_rewards(self, reset=False):
         """

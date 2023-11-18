@@ -77,7 +77,9 @@ if __name__ == '__main__':
                 n_steps=n_steps // 8, 
                 tensorboard_log=tb_path)
 
-    model.learn(total_timesteps=n_steps*n_envs*1000, callback=callbacks)
+    learning_iters = 10
+    for i in range(learning_iters):
+        model.learn(total_timesteps=n_steps*n_envs*1000, callback=callbacks)
 
     # close environments
     env.close()
