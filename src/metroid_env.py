@@ -1,5 +1,4 @@
 from random import randint
-import csv
 
 import numpy as np
 
@@ -79,6 +78,7 @@ class MetroidGymEnv(Env):
             'beam_upgrade': 0,
             'metroids_remaining': 0,
             'enemies_killed': 0,
+            'exploration': 0,
 
             'deaths': 0,
             'damage_taken': 0
@@ -92,6 +92,7 @@ class MetroidGymEnv(Env):
             'beam_upgrade': 20,
             'metroids_remaining': 100,
             'enemies_killed': 10,
+            'exploration': 0.01,
 
             'deaths': 1,
             'damage_taken': 1
@@ -107,6 +108,8 @@ class MetroidGymEnv(Env):
         self.previous_sfx = 0
 
         self.enemies_killed = 0
+
+        self.explored_coordinates = {}
 
         self.deaths = 0
 
@@ -298,6 +301,7 @@ class MetroidGymEnv(Env):
             'beam_upgrade': self.get_beam_upgrade_reward(),
             'metroids_remaining': self.get_metroids_remaining_reward(),
             'enemies_killed': self.get_enemies_killed_reward(),
+            'exploration': self.get_exploration_reward(),
 
             # 'deaths': self.get_deaths_punishment(),
             # 'damage_taken': self.get_damage_taken_punishment()
@@ -373,7 +377,7 @@ class MetroidGymEnv(Env):
         
         reward = 0
         # check if beam is different, and not just switched to/from missiles
-        if curr_beam != self.previous_beam_upgrade and (curr_beam != 8 or self.previous_beam_upgrade != 8):
+        if curr_beam != self.previous_beam_upgrade:
             reward = 1
 
         self.previous_beam_upgrade = curr_beam
@@ -399,6 +403,39 @@ class MetroidGymEnv(Env):
         :return: (int)
         """
         return self.enemies_killed
+
+
+    def get_exploration_reward(self):
+        """
+        Checks to see if coordinates have been explored.
+        Returns the number of unique coordinates explored
+
+        :return: (int)
+        """
+        reward = 0
+
+        # get screen x and y coordinates
+        sx = self.read_memory(mem.PREV_SAMUS_SCREEN_X_PIXEL)
+        sy = self.read_memory(mem.PREV_SAMUS_SCREEN_Y_PIXEL)
+        screen_position = (sx, sy)
+
+        # get x and y coordinates
+        x = self.read_memory(mem.PREV_SAMUS_X_PIXEL)
+        y = self.read_memory(mem.PREV_SAMUS_Y_PIXEL)
+        samus_position = (x, y)
+
+        # check if this pixel has been explored
+        if screen_position in self.explored_coordinates:
+            if samus_position not in self.explored_coordinates[screen_position]:
+                self.explored_coordinates[screen_position].append(samus_position)        
+        else:
+            self.explored_coordinates[screen_position] = [samus_position]
+
+        # add all unique coordinates
+        for sp in self.explored_coordinates:
+            reward += len(self.explored_coordinates[sp])
+
+        return reward
 
 
     def get_deaths_punishment(self):

@@ -33,9 +33,9 @@ def make_env(rank, config, seed=0):
 
 if __name__ == '__main__':
 
-    cfg = c.basic
+    cfg = c.short
     n_steps = cfg["max_steps"]
-    n_envs = 6
+    n_envs = cfg["n_envs"]
 
     session_id = str(uuid4())[:5]
     session_path = Path(f'sessions/session_{session_id}')

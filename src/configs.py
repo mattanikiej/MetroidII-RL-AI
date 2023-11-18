@@ -9,6 +9,7 @@ basic = {
     "seed": None,
     "max_steps": 32768,
     "window": 'headless',
+    "n_envs": 6
 }
 
 short = {
@@ -20,7 +21,8 @@ short = {
     "rom_path": "../ROMs/Metroid2.gb",
     "seed": None,
     "max_steps": 500,
-    "window": 'headless',
+    "window": 'SDL2',
+    "n_envs": 1
 }
 
 replay = {
@@ -30,4 +32,5 @@ replay = {
     "seed": None,
     "max_steps": 5000,
     "window": 'SDL2',
+    "n_envs": 1
 }
