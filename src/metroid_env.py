@@ -75,7 +75,11 @@ class MetroidGymEnv(Env):
         # set gym attributes
         self.action_space = spaces.Discrete(len(self.valid_actions))
         self.reward_range = (-100, 15000)
-        self.observation_space = spaces.Box(low=0, high=255, shape=(144, 160, 3), dtype=np.uint8)
+        # observation is current frame and previous frame to give cnn sense of movement
+        self.observation_space = spaces.Box(low=0, high=255, shape=(2, 144, 160), dtype=np.uint8)
+
+        # initialized in self.reset()
+        self.previous_frame = None
 
         # rewards are initialized during self.update_rewards() in self.reset()
         self.rewards = {
@@ -147,16 +151,14 @@ class MetroidGymEnv(Env):
 
         :return: (ObsType), (SupportsFloat), (bool), (bool), (dict)
         """
-        self.act(action)
-        game_pixels = self.render()
-
-        reward_gain = self.update_rewards()
-
         self.steps_taken += 1
+        self.act(action)
 
+        obs = self.render()
+        reward_gain = self.update_rewards()
         terminated = self.check_if_done()
 
-        return game_pixels, reward_gain, terminated, False, {}
+        return obs, reward_gain, terminated, False, {}
 
 
     def reset(self, seed=None):
@@ -196,6 +198,9 @@ class MetroidGymEnv(Env):
 
         self.update_rewards()
 
+        screen = self.pyboy.botsupport_manager().screen()
+        self.previous_frame = screen.screen_ndarray()[:, :, 0]
+
         return self.render(), {}
 
 
@@ -210,8 +215,14 @@ class MetroidGymEnv(Env):
         """
         # get screen pixels values
         screen = self.pyboy.botsupport_manager().screen()
-        game_pixels = screen.screen_ndarray() # (144, 160, 3)
-        return game_pixels
+        # game is grayscale so only the top dimension from rgb array is needed
+        frame_pixels = screen.screen_ndarray()[:, :, 0] # (144, 160)
+
+        obs = np.array([frame_pixels, self.previous_frame])
+
+        self.previous_frame = frame_pixels
+
+        return obs
 
 
     def close(self):
