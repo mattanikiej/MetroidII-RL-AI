@@ -220,8 +220,6 @@ class MetroidGymEnv(Env):
 
         obs = np.array([frame_pixels, self.previous_frame])
 
-        self.previous_frame = frame_pixels
-
         return obs
 
 
@@ -249,7 +247,7 @@ class MetroidGymEnv(Env):
         # send action then tick self.action_frequency number of steps
         self.pyboy.send_input(self.valid_actions[action])
 
-        for _ in range(self.action_frequency):
+        for i in range(self.action_frequency):
             # advance game 1 frame
             self.pyboy.tick()
 
@@ -266,6 +264,11 @@ class MetroidGymEnv(Env):
             if self.samus_is_dead():
                 self.deaths += 1
                 self.reset()
+
+            # get previous frame before next step
+            if i == 2 - self.action_frequency:
+                screen = self.pyboy.botsupport_manager().screen()
+                self.previous_frame = screen.screen_ndarray()[:, :, 0]
 
 
     def has_enemy_died(self):
