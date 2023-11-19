@@ -79,7 +79,7 @@ class MetroidGymEnv(Env):
         self.observation_space = spaces.Box(low=0, high=255, shape=(2, 144, 160), dtype=np.uint8)
 
         # initialized in self.reset()
-        self.previous_frame = None
+        self.previous_frame = None # (144, 160)
 
         # rewards are initialized during self.update_rewards() in self.reset()
         self.rewards = {
