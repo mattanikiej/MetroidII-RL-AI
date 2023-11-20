@@ -58,6 +58,8 @@ Unless you have a very powerful computer, and A LOT (and I mean A LOT) of time, 
 * decrease ```n_envs``` field in the configuration you're using to reduce cpu usage
 * decrease ```n_epochs``` in ```train.py``` to reduce time
 * decrease ```learning_iters``` in ```train.py``` to reduce time
+* decrease ```batch_size``` argument in the ```PPO``` model in ```train.py``` to decrease memory load
+* decrease ```n_steps``` argument in the ```PPO``` model in ```train.py``` to decrease memory load
 
 ## 🔨 Troubleshooting 🔨
 If you have issues running the model for both the pretrained and/or training files, try these steps:
