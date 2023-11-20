@@ -21,10 +21,10 @@ short = {
                "../states/post_start_screen.state"],
     "rom_path": "../ROMs/Metroid2.gb",
     "seed": None,
-    "max_steps": 500,
-    "window": 'SDL2',
-    "n_envs": 1,
-    "save_rewards": True
+    "max_steps": 512,
+    "window": 'headless',
+    "n_envs": 10,
+    "save_rewards": False
 }
 
 replay = {
