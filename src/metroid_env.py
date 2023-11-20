@@ -196,6 +196,8 @@ class MetroidGymEnv(Env):
 
         self.enemies_killed = 0
 
+        self.explored_coordinates = {}
+
         self.update_rewards()
 
         screen = self.pyboy.botsupport_manager().screen()
