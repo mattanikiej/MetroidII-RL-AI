@@ -12,18 +12,21 @@ __This is a reinforcement learning artificial intelligence model built to play t
 ## 👾 Getting Started 👾
 1. Clone this repo
 2. Install correct python version: 3.10.13
-    * if using anaconda you can run these commands in terminal
+    * if using anaconda, you can create a new environment by running these commands in terminal
     ```
     conda create --name metroidai python=3.10.13
     conda activate metroidai
     ```
-    * you can also use pyenv, some other ython environment handler, or just insall python 3.10.13 to your machine
-    * This probably will work with python, but it hasn't been tested
+    * you can also use pyenv, some other python environment handler, or just insall python 3.10.13 to your machine
+    * This probably will work with other versions of python, but it hasn't been tested
 3. Open up the repo in terminal and run
 ```
 pip install -r requirements.txt
 ```
 4. Create a folder called ```ROMs``` in the root of the repository
+```
+mkdir ROMs
+```
 5. Legally obtain a Metroid II ROM and copy the .gb file into the ```ROMs/``` directory
     * You also have to rename the file to ```Metroid2.gb```
 
@@ -52,14 +55,14 @@ python train.py
 ### Tips For Training
 Unless you have a very powerful computer, and A LOT (and I mean A LOT) of time, I would recommend the following changes:
 * decrease the ```max_iter``` field in the configuration you're using to reduce time
-* decrease ```n_envs``` in the configuration you're using to reduce cpu usage
+* decrease ```n_envs``` field in the configuration you're using to reduce cpu usage
 * decrease ```n_epochs``` in ```train.py``` to reduce time
 * decrease ```learning_iters``` in ```train.py``` to reduce time
 
 ## 🔨 Troubleshooting 🔨
 If you have issues running the model for both the pretrained and/or training files, try these steps:
-* make sure you are running ```train.py``` or ```run_pretrained_model.py``` from ```src/``` directory
-* Set ```n_envs = 1``` in ```train.py``` if you have issues with parallelizing the model
+* Make sure you are running ```train.py``` or ```run_pretrained_model.py``` from ```src/``` directory
+* Set ```n_envs``` to ```1``` in the configuration you're using if you have issues with parallelizing the model
 * Make sure correct versions of libraries in requirements.txt are being used
 * Make sure ffmpeg is installed
 * Make sure Python 3.10.13 is used
