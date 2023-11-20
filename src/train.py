@@ -1,16 +1,14 @@
 from pathlib import Path
 from uuid import uuid4
 
-from metroid_env import MetroidGymEnv
-
 from stable_baselines3 import PPO
-
-import configs as c
-
 from stable_baselines3.common.vec_env import SubprocVecEnv
 from stable_baselines3.common.vec_env import vec_transpose
 from stable_baselines3.common.utils import set_random_seed
 from stable_baselines3.common.callbacks import CheckpointCallback, EvalCallback, CallbackList
+
+from metroid_env import MetroidGymEnv
+import configs as c
 
 
 def make_env(rank, config, seed=0):

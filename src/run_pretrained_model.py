@@ -1,10 +1,9 @@
-from metroid_env import MetroidGymEnv
-
 from stable_baselines3 import PPO
+from stable_baselines3.common.utils import set_random_seed
 
+from metroid_env import MetroidGymEnv
 import configs as c
 
-from stable_baselines3.common.utils import set_random_seed
 
 def make_env(rank, config, seed=0):
     """
