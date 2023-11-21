@@ -83,8 +83,12 @@ class MetroidGymEnv(Env):
         # initialized in self.reset()
         self.previous_frame = None # (144, 160)
 
+        # info for target distance reward
+        self.reached_target = False
+        self.target_screen_coord = (1,1) 
+        self.max_dist = 0
+
         # rewards are initialized during self.update_rewards() in self.reset()
-        self.target_screen_coord = (1,1) # screen coordinates for the ai to try to get to
         self.rewards = {}
 
         # weights are all > 0
@@ -96,7 +100,8 @@ class MetroidGymEnv(Env):
             'metroids_remaining': 200,
             'enemies_killed': 30,
             'exploration': 0.25,
-            'target_distance': 1,
+            'target_distance': 2,
+            'target_reached': 100
 
             # 'deaths': 1,
             # 'damage_taken': 1
@@ -190,6 +195,11 @@ class MetroidGymEnv(Env):
         self.enemies_killed = 0
 
         self.explored_coordinates = {}
+
+        self.reached_target = False
+        x = self.read_memory(mem.PREV_SAMUS_X_SCREEN)
+        y = self.read_memory(mem.PREV_SAMUS_Y_SCREEN)
+        self.max_dist = math.dist((x, y), self.target_screen_coord)
 
         self.update_rewards()
 
@@ -359,6 +369,7 @@ class MetroidGymEnv(Env):
             'enemies_killed': self.get_enemies_killed_reward(),
             'exploration': self.get_exploration_reward(),
             'target_distance': self.get_target_distance_reward(),
+            'target_reached': self.get_target_reached_reward(),
 
             # 'deaths': self.get_deaths_punishment(),
             # 'damage_taken': self.get_damage_taken_punishment()
@@ -500,8 +511,26 @@ class MetroidGymEnv(Env):
         dist = math.dist((x, y), self.target_screen_coord)
         
         # reward increases as you get closer
-        reward = 50 - dist
+        reward = self.max_dist - dist
         return reward
+
+
+    def get_target_reached_reward(self):
+        """
+        Returns a reward if the target was reached, and only once
+        """
+        reward = 0
+
+        x = self.read_memory(mem.PREV_SAMUS_X_SCREEN)
+        y = self.read_memory(mem.PREV_SAMUS_Y_SCREEN)
+
+        dist = math.dist((x, y), self.target_screen_coord)
+
+        if not self.reached_target and dist == 0:
+            self.reached_target = True
+            reward = 1
+
+        return reward  
 
 
     def get_deaths_punishment(self):
