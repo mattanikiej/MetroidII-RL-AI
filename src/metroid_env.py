@@ -85,19 +85,7 @@ class MetroidGymEnv(Env):
 
         # rewards are initialized during self.update_rewards() in self.reset()
         self.target_screen_coord = (1,1) # screen coordinates for the ai to try to get to
-        self.rewards = {
-            'health_pickup': 0,
-            'missile_pickup': 0,
-            'armor_upgrade': 0,
-            'beam_upgrade': 0,
-            'metroids_remaining': 0,
-            'enemies_killed': 0,
-            'exploration': 0,
-            'target_distance': 0,
-
-            # 'deaths': 0,
-            # 'damage_taken': 0
-        }
+        self.rewards = {}
 
         # weights are all > 0
         self.reward_weights = {
@@ -370,6 +358,7 @@ class MetroidGymEnv(Env):
             'metroids_remaining': self.get_metroids_remaining_reward(),
             'enemies_killed': self.get_enemies_killed_reward(),
             'exploration': self.get_exploration_reward(),
+            'target_distance': self.get_target_distance_reward(),
 
             # 'deaths': self.get_deaths_punishment(),
             # 'damage_taken': self.get_damage_taken_punishment()
