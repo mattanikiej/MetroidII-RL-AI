@@ -226,7 +226,6 @@ class MetroidGymEnv(Env):
         frame_pixels = screen.screen_ndarray()[:, :, 0] # (144, 160)
 
         obs = np.array([frame_pixels, self.previous_frame])
-        print(obs.shape)
         obs = np.reshape(obs, self.obs_shape)
 
         return obs
