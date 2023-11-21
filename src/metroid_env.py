@@ -1,6 +1,7 @@
 from random import randint
 from uuid import uuid4
 from pathlib import Path
+import math
 
 import numpy as np
 import pandas as pd
@@ -83,6 +84,7 @@ class MetroidGymEnv(Env):
         self.previous_frame = None # (144, 160)
 
         # rewards are initialized during self.update_rewards() in self.reset()
+        self.target_screen_coord = (1,1) # screen coordinates for the ai to try to get to
         self.rewards = {
             'health_pickup': 0,
             'missile_pickup': 0,
@@ -91,6 +93,7 @@ class MetroidGymEnv(Env):
             'metroids_remaining': 0,
             'enemies_killed': 0,
             'exploration': 0,
+            'target_distance': 0,
 
             # 'deaths': 0,
             # 'damage_taken': 0
@@ -105,6 +108,7 @@ class MetroidGymEnv(Env):
             'metroids_remaining': 200,
             'enemies_killed': 30,
             'exploration': 0.25,
+            'target_distance': 1,
 
             # 'deaths': 1,
             # 'damage_taken': 1
@@ -493,6 +497,22 @@ class MetroidGymEnv(Env):
         for xc in self.explored_coordinates:
             reward += len(self.explored_coordinates[xc])
 
+        return reward
+
+
+    def get_target_distance_reward(self):
+        """
+        Gets the distance from Samus to the target and returns the reward
+
+        :return: (int)
+        """
+        x = self.read_memory(mem.PREV_SAMUS_X_SCREEN)
+        y = self.read_memory(mem.PREV_SAMUS_Y_SCREEN)
+
+        dist = math.dist((x, y), self.target_screen_coord)
+        
+        # reward increases as you get closer
+        reward = 50 - dist
         return reward
 
 
