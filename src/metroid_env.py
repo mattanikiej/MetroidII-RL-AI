@@ -104,7 +104,7 @@ class MetroidGymEnv(Env):
             'beam_upgrade': 50,
             'metroids_remaining': 200,
             'enemies_killed': 30,
-            'exploration': 0.25,
+            'exploration': 1,
 
             # 'deaths': 1,
             # 'damage_taken': 1
