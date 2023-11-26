@@ -66,14 +66,27 @@ if __name__ == '__main__':
 
     callbacks = CallbackList(callbacks)
 
+    model = None
     n_epochs = 10
-    model = PPO('CnnPolicy', 
-                env, 
-                verbose=1, 
-                n_epochs=n_epochs, 
-                batch_size=128, 
-                n_steps=n_steps // 8, 
-                tensorboard_log=tb_path)
+    train_on_pretrained = True
+    if train_on_pretrained:
+        file_name = ''
+        model = PPO.load(file_name, env=env)
+        model.n_epochs = n_epochs
+        model.n_steps = n_steps
+        model.n_envs = n_envs
+        model.rollout_buffer.buffer_size = n_steps
+        model.rollout_buffer.n_envs = n_envs
+        model.rollout_buffer.reset()
+
+    else:
+        model = PPO('CnnPolicy', 
+                    env, 
+                    verbose=1, 
+                    n_epochs=n_epochs, 
+                    batch_size=128, 
+                    n_steps=n_steps // 8, 
+                    tensorboard_log=tb_path)
 
     learning_iters = 10
     for i in range(learning_iters):
