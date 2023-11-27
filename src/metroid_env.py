@@ -99,7 +99,7 @@ class MetroidGymEnv(Env):
             'beam_upgrade': 50,
             'metroids_remaining': 200,
             'enemies_killed': 30,
-            'exploration': 0.25,
+            'exploration': 1,
             'target_distance': 2,
             'target_reached': 100
 
