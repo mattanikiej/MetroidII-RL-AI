@@ -77,7 +77,7 @@ class MetroidGymEnv(Env):
         self.action_space = spaces.Discrete(len(self.valid_actions))
         self.reward_range = (-100, 15000)
         # observation is current frame and previous frame to give cnn sense of movement
-        self.obs_shape = (144, 160, 2)
+        self.obs_shape = (2, 144, 160)
         self.observation_space = spaces.Box(low=0, high=255, shape=self.obs_shape, dtype=np.uint8)
 
         # initialized in self.reset()

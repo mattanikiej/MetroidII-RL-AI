@@ -68,9 +68,9 @@ if __name__ == '__main__':
 
     model = None
     n_epochs = 10
-    train_on_pretrained = True
+    train_on_pretrained = False
     if train_on_pretrained:
-        file_name = ''
+        file_name = 'sessions/session_4bd29/mai_32768000_steps'
         model = PPO.load(file_name, env=env)
         model.n_epochs = n_epochs
         model.n_steps = n_steps
@@ -88,7 +88,7 @@ if __name__ == '__main__':
                     n_steps=n_steps // 8, 
                     tensorboard_log=tb_path)
 
-    learning_iters = 10
+    learning_iters = 1
     for i in range(learning_iters):
         model.learn(total_timesteps=n_steps*n_envs*100, callback=callbacks)
 
