@@ -12,6 +12,7 @@ from pyboy import PyBoy
 from pyboy.utils import WindowEvent
 
 import memory_constants as mem
+import checkpoint_path as chk
 
 
 class MetroidGymEnv(Env):
@@ -75,9 +76,9 @@ class MetroidGymEnv(Env):
 
         # set gym attributes
         self.action_space = spaces.Discrete(len(self.valid_actions))
-        self.reward_range = (-100, 15000)
+        self.reward_range = (-math.inf, math.inf)
         # observation is current frame and previous frame to give cnn sense of movement
-        self.obs_shape = (2, 144, 160)
+        self.obs_shape = (144, 160, 3)
         self.observation_space = spaces.Box(low=0, high=255, shape=self.obs_shape, dtype=np.uint8)
 
         # initialized in self.reset()
@@ -98,13 +99,14 @@ class MetroidGymEnv(Env):
             'armor_upgrade': 50,
             'beam_upgrade': 50,
             'metroids_remaining': 200,
-            'enemies_killed': 30,
+            'enemies_killed': 10,
             'exploration': 1,
             'target_distance': 2,
-            'target_reached': 100
+            'target_reached': 10,
+            'checkpoint_passed': 10,
 
-            # 'deaths': 1,
-            # 'damage_taken': 1
+            'deaths': 1,
+            'damage_taken': 1
         }
         
         self.rewards_df = None if not self.save_rewards else pd.DataFrame(self.rewards, index=[0])
@@ -118,6 +120,7 @@ class MetroidGymEnv(Env):
         self.previous_beam_upgrade = 0
         self.previous_metroids_remaining = 0
         self.previous_sfx = 0
+        self.previous_checkpoint = (0,0)
 
         self.enemies_killed = 0
 
@@ -191,6 +194,8 @@ class MetroidGymEnv(Env):
         self.previous_beam_upgrade = self.read_memory(mem.CURRENT_BEAM_UPGRADE)
         self.previous_metroids_remaining = self.read_memory(mem.GLOBAL_METROIDS_REMAINING)
         self.previous_sfx = self.read_memory(mem.SFX_PLAYING)
+        self.previous_checkpoint = (self.read_memory(mem.PREV_SAMUS_X_SCREEN), 
+                                    self.read_memory(mem.PREV_SAMUS_Y_SCREEN))
 
         self.enemies_killed = 0
 
@@ -221,12 +226,12 @@ class MetroidGymEnv(Env):
         # get screen pixels values
         screen = self.pyboy.botsupport_manager().screen()
         # game is grayscale so only the top dimension from rgb array is needed
-        frame_pixels = screen.screen_ndarray()[:, :, 0] # (144, 160)
+        frame_pixels = screen.screen_ndarray() # (144, 160, 3)
 
-        obs = np.array([frame_pixels, self.previous_frame])
-        obs = np.reshape(obs, self.obs_shape)
+        # obs = np.array([frame_pixels, self.previous_frame])
+        # obs = np.reshape(obs, self.obs_shape)
 
-        return obs
+        return frame_pixels
 
 
     def close(self):
@@ -367,9 +372,10 @@ class MetroidGymEnv(Env):
             'beam_upgrade': self.get_beam_upgrade_reward(),
             'metroids_remaining': self.get_metroids_remaining_reward(),
             'enemies_killed': self.get_enemies_killed_reward(),
-            'exploration': self.get_exploration_reward(),
-            'target_distance': self.get_target_distance_reward(),
-            'target_reached': self.get_target_reached_reward(),
+            # 'exploration': self.get_exploration_reward(),
+            # 'target_distance': self.get_target_distance_reward(),
+            # 'target_reached': self.get_target_reached_reward(),
+            'checkpoint_passed': self.get_checkpoint_passed_reward(),
 
             # 'deaths': self.get_deaths_punishment(),
             # 'damage_taken': self.get_damage_taken_punishment()
@@ -518,6 +524,8 @@ class MetroidGymEnv(Env):
     def get_target_reached_reward(self):
         """
         Returns a reward if the target was reached, and only once
+
+        :return: (int)
         """
         reward = 0
 
@@ -531,6 +539,27 @@ class MetroidGymEnv(Env):
             reward = 1
 
         return reward  
+
+
+    def get_checkpoint_passed_reward(self):
+        """
+        Returns a reward if passed the next checkpoint
+
+        :return: (int)
+        """
+        reward = 0
+        next_checkpoint = chk.checkpoints[self.previous_checkpoint]
+
+        x = self.read_memory(mem.PREV_SAMUS_X_SCREEN)
+        y = self.read_memory(mem.PREV_SAMUS_Y_SCREEN)
+
+        curr = (x,y)
+        if curr[0] == next_checkpoint[0] and curr[1] == next_checkpoint[1]:
+            self.previous_checkpoint = curr
+            reward = 1
+            print("REACHED CHECKPOINT")
+
+        return reward
 
 
     def get_deaths_punishment(self):
