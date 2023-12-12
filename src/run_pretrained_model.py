@@ -26,7 +26,7 @@ if __name__ == "__main__":
 
     env = make_env(0, c.replay)()
 
-    file_name = 'sessions/session_4bd29/mai_32768000_steps'
+    file_name = 'sessions/session_158eb/mai_3276800_steps'
     model = PPO.load(file_name, env=env)
 
     obs, info = env.reset()

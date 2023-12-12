@@ -2,8 +2,7 @@ from pathlib import Path
 from uuid import uuid4
 
 from stable_baselines3 import PPO
-from stable_baselines3.common.vec_env import SubprocVecEnv
-from stable_baselines3.common.vec_env import vec_transpose
+from stable_baselines3.common.vec_env import SubprocVecEnv, vec_transpose
 from stable_baselines3.common.utils import set_random_seed
 from stable_baselines3.common.callbacks import CheckpointCallback, EvalCallback, CallbackList
 
@@ -68,15 +67,15 @@ if __name__ == '__main__':
 
     model = None
     n_epochs = 10
-    train_on_pretrained = False
+    train_on_pretrained = True
     if train_on_pretrained:
-        file_name = 'sessions/session_4bd29/mai_32768000_steps'
+        file_name = 'sessions/session_158eb/mai_3276800_steps'
         model = PPO.load(file_name, env=env)
+        model.verbose = 1
         model.n_epochs = n_epochs
-        model.n_steps = n_steps
+        model.batch_size = 256
+        model.n_steps = n_steps//8
         model.n_envs = n_envs
-        model.rollout_buffer.buffer_size = n_steps
-        model.rollout_buffer.n_envs = n_envs
         model.rollout_buffer.reset()
 
     else:
@@ -84,13 +83,13 @@ if __name__ == '__main__':
                     env, 
                     verbose=1, 
                     n_epochs=n_epochs, 
-                    batch_size=128, 
+                    batch_size=256, 
                     n_steps=n_steps // 8, 
                     tensorboard_log=tb_path)
 
     learning_iters = 1
     for i in range(learning_iters):
-        model.learn(total_timesteps=n_steps*n_envs*100, callback=callbacks)
+        model.learn(total_timesteps=n_steps*n_envs*10, callback=callbacks)
 
     # close environments
     env.close()

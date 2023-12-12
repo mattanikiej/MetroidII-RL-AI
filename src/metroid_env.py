@@ -51,21 +51,23 @@ class MetroidGymEnv(Env):
             WindowEvent.PRESS_ARROW_LEFT,
             WindowEvent.PRESS_ARROW_UP,
             WindowEvent.PRESS_ARROW_RIGHT,
-
-            WindowEvent.RELEASE_ARROW_DOWN,
-            WindowEvent.RELEASE_ARROW_LEFT,
-            WindowEvent.RELEASE_ARROW_UP,
-            WindowEvent.RELEASE_ARROW_RIGHT,
-
+            
             # jump/ shoot
             WindowEvent.PRESS_BUTTON_A,
             WindowEvent.PRESS_BUTTON_B,
 
-            WindowEvent.RELEASE_BUTTON_A,
-            WindowEvent.RELEASE_BUTTON_B,
-
             # toggle missiles
             WindowEvent.PRESS_BUTTON_SELECT
+        ]
+
+        self.release_actions = [
+            WindowEvent.RELEASE_ARROW_DOWN,
+            WindowEvent.RELEASE_ARROW_LEFT,
+            WindowEvent.RELEASE_ARROW_UP,
+            WindowEvent.RELEASE_ARROW_RIGHT,
+            WindowEvent.RELEASE_BUTTON_A,
+            WindowEvent.RELEASE_BUTTON_B,
+            WindowEvent.RELEASE_BUTTON_SELECT
         ]
 
         self.last_pressed = None
@@ -250,10 +252,6 @@ class MetroidGymEnv(Env):
 
         :param action (actType): action to send to pyboy
         """
-        # only WindowEvent.PRESS_BUTTON_SELECT should be immediately released
-        select_pressed = False
-        if self.valid_actions[action] == WindowEvent.PRESS_BUTTON_SELECT:
-            select_pressed = True
 
         # send action then tick self.action_frequency number of steps
         self.pyboy.send_input(self.valid_actions[action])
@@ -261,11 +259,6 @@ class MetroidGymEnv(Env):
         for i in range(self.action_frequency):
             # advance game 1 frame
             self.pyboy.tick()
-
-            # release select if pressed
-            if select_pressed:
-                select_pressed = False
-                self.pyboy.send_input(WindowEvent.RELEASE_BUTTON_SELECT)
 
             # check if enemy has died
             if self.has_enemy_died():
@@ -280,6 +273,9 @@ class MetroidGymEnv(Env):
             if i == 2 - self.action_frequency:
                 screen = self.pyboy.botsupport_manager().screen()
                 self.previous_frame = screen.screen_ndarray()[:, :, 0]
+
+        # release button
+        self.pyboy.send_input(self.release_actions[action])
 
 
     def has_enemy_died(self):
@@ -557,7 +553,6 @@ class MetroidGymEnv(Env):
         if curr[0] == next_checkpoint[0] and curr[1] == next_checkpoint[1]:
             self.previous_checkpoint = curr
             reward = 1
-            print("REACHED CHECKPOINT")
 
         return reward
 
