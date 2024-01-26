@@ -1,5 +1,7 @@
-from stable_baselines3 import PPO
+from stable_baselines3 import PPO, DQN
 from stable_baselines3.common.utils import set_random_seed
+
+import torch
 
 from metroid_env import MetroidGymEnv
 import configs as c
@@ -26,14 +28,17 @@ if __name__ == "__main__":
 
     env = make_env(0, c.replay)()
 
-    file_name = 'sessions/session_158eb/mai_3276800_steps'
-    model = PPO.load(file_name, env=env)
+    file_name = 'sessions/session_74c9c/mai_32768000_steps.zip'
+    model = DQN.load(file_name, env=env)
+    model.verbose = 1
+    model.batch_size = 256
+
 
     obs, info = env.reset()
     while True:
 
         action, _states = model.predict(obs)
         obs, rewards, terminated, truncated, info = env.step(action)
-        env.render()
+        obs = env.render()
 
     env.close()

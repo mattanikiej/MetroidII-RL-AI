@@ -1,7 +1,7 @@
 from pathlib import Path
 from uuid import uuid4
 
-from stable_baselines3 import PPO
+from stable_baselines3 import PPO, DQN
 from stable_baselines3.common.vec_env import SubprocVecEnv, vec_transpose
 from stable_baselines3.common.utils import set_random_seed
 from stable_baselines3.common.callbacks import CheckpointCallback, EvalCallback, CallbackList
@@ -65,31 +65,25 @@ if __name__ == '__main__':
 
     callbacks = CallbackList(callbacks)
 
-    model = None
-    n_epochs = 10
-    train_on_pretrained = True
+    model = DQN('CnnPolicy', 
+                env, 
+                verbose=1, 
+                buffer_size=10000,
+                batch_size=256, 
+                tensorboard_log=tb_path)
+    
+    # load pretrained model
+    train_on_pretrained = False
     if train_on_pretrained:
-        file_name = 'sessions/session_158eb/mai_3276800_steps'
-        model = PPO.load(file_name, env=env)
+        file_name = 'sessions/session_cd1f9/mai_51200_steps'
+        model = DQN.load(file_name, env=env)
         model.verbose = 1
-        model.n_epochs = n_epochs
         model.batch_size = 256
-        model.n_steps = n_steps//8
         model.n_envs = n_envs
-        model.rollout_buffer.reset()
+        model.tensorboard_log=tb_path
 
-    else:
-        model = PPO('CnnPolicy', 
-                    env, 
-                    verbose=1, 
-                    n_epochs=n_epochs, 
-                    batch_size=256, 
-                    n_steps=n_steps // 8, 
-                    tensorboard_log=tb_path)
 
-    learning_iters = 1
-    for i in range(learning_iters):
-        model.learn(total_timesteps=n_steps*n_envs*10, callback=callbacks)
+    model.learn(total_timesteps=n_steps*n_envs*100000, callback=callbacks)
 
     # close environments
     env.close()

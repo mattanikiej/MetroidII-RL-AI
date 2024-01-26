@@ -129,6 +129,7 @@ class MetroidGymEnv(Env):
         self.explored_coordinates = {}
 
         self.deaths = 0
+        self.dead = False
 
         self.steps_taken = 0
 
@@ -267,7 +268,7 @@ class MetroidGymEnv(Env):
             # check hp to see if game needs to be reset
             if self.samus_is_dead():
                 self.deaths += 1
-                self.reset()
+                self.dead = True
 
             # get previous frame before next step
             if i == 2 - self.action_frequency:
@@ -306,6 +307,7 @@ class MetroidGymEnv(Env):
         health = self.pyboy.get_memory_value(mem.CURRENT_HP)
         if health <= 0:
             dead = True
+
         return dead
 
 
@@ -314,7 +316,7 @@ class MetroidGymEnv(Env):
         Check if the max number of steps has been reached
         """
         done = False
-        if self.steps_taken >= self.max_steps:
+        if self.steps_taken >= self.max_steps or self.dead:
             print(f"Total Rewards: {self.total_reward}")
             
             if self.save_rewards:
@@ -324,6 +326,7 @@ class MetroidGymEnv(Env):
                 self.save_rewards_csv()
 
             done = True
+            self.dead = False
         return done
 
 
@@ -360,7 +363,7 @@ class MetroidGymEnv(Env):
 
         :return: (int)
         """
-        # all rewards are > 0 and all punishments are < 0
+        # all rewards are >= 0 and all punishments are <= 0
         self.rewards = {
             'health_pickup': self.get_health_pickup_reward(),
             'missile_pickup': self.get_missile_pickup_reward(),
