@@ -83,7 +83,7 @@ if __name__ == '__main__':
         model.tensorboard_log=tb_path
 
 
-    model.learn(total_timesteps=n_steps*n_envs*100000, callback=callbacks)
+    model.learn(total_timesteps=n_steps*n_envs*500, callback=callbacks)
 
     # close environments
     env.close()

@@ -28,7 +28,7 @@ if __name__ == "__main__":
 
     env = make_env(0, c.replay)()
 
-    file_name = 'sessions/session_74c9c/mai_32768000_steps.zip'
+    file_name = 'sessions/session_24636/mai_25231360_steps.zip'
     model = DQN.load(file_name, env=env)
     model.verbose = 1
     model.batch_size = 256
