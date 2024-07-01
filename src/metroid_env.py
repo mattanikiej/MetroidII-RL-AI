@@ -47,7 +47,7 @@ class MetroidGymEnv(Env):
         # initialize movement
         self.valid_actions = [
             # move samus
-            WindowEvent.PRESS_ARROW_DOWN,
+            # WindowEvent.PRESS_ARROW_DOWN,
             WindowEvent.PRESS_ARROW_LEFT,
             WindowEvent.PRESS_ARROW_UP,
             # WindowEvent.PRESS_ARROW_RIGHT,
@@ -61,7 +61,7 @@ class MetroidGymEnv(Env):
         ]
 
         self.release_actions = [
-            WindowEvent.RELEASE_ARROW_DOWN,
+            # WindowEvent.RELEASE_ARROW_DOWN,
             WindowEvent.RELEASE_ARROW_LEFT,
             WindowEvent.RELEASE_ARROW_UP,
             # WindowEvent.RELEASE_ARROW_RIGHT,
