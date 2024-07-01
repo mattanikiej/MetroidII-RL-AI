@@ -40,7 +40,7 @@ short = {
     "max_steps": 512,
     "window": 'headless',
     "n_envs": 10,
-    "save_rewards": False
+    "save_rewards": True
 }
 
 replay = {
