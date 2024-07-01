@@ -1,3 +1,5 @@
+import os
+
 # ALL custom configs must have the same fields
 basic = {
     "action_frequency": 5,
@@ -17,7 +19,7 @@ basic = {
     "seed": None,
     "max_steps": 32768,
     "window": 'headless',
-    "n_envs": 10,
+    "n_envs": os.cpu_count(),
     "save_rewards": True
 }
 
