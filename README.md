@@ -5,8 +5,8 @@
 
 __This is a reinforcement learning artificial intelligence model built to play the GameBoy game, Metroid II: Return of Samus.__
 
-## Checkout the YouTube video about the AI and the model breakdown
-<img alt="YouTube thumbnail" src="/assets/thumbnail.png" height="200"> <img alt="YouTube breakdown thumbnail" src="/assets/tb_thumbnail.png" height="200">
+<!-- ## Checkout the YouTube video about the AI and the model breakdown
+<img alt="YouTube thumbnail" src="/assets/thumbnail.png" height="200"> <img alt="YouTube breakdown thumbnail" src="/assets/tb_thumbnail.png" height="200"> -->
 
 
 ## 👾 Getting Started 👾
@@ -53,13 +53,15 @@ python train.py
 ```
 
 ### Tips For Training
-Unless you have a very powerful computer, and A LOT (and I mean A LOT) of time, I would recommend the following changes:
+Unless you have a very powerful computer, and a lot (and I mean A LOT) of time, I would recommend the following changes:
 * decrease the ```max_iter``` field in the configuration you're using to reduce time
 * decrease ```n_envs``` field in the configuration you're using to reduce cpu usage
 * decrease ```n_epochs``` in ```train.py``` to reduce time
 * decrease ```learning_iters``` in ```train.py``` to reduce time
 * decrease ```batch_size``` argument in the ```PPO``` model in ```train.py``` to decrease memory load
 * decrease ```n_steps``` argument in the ```PPO``` model in ```train.py``` to decrease memory load
+
+The code is written to take full advantage of cloud computing, and utilizes hardware that is far more powerful than what most people have on their personal machines.
 
 ## 🔨 Troubleshooting 🔨
 If you have issues running the model for both the pretrained and/or training files, try these steps:
