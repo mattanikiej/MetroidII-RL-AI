@@ -9,3 +9,6 @@ ROMs/*
 
 # files
 */scratchpad.py
+
+# cloud computing
+*.pem

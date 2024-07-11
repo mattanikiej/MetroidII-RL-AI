@@ -5,9 +5,6 @@
 
 __This is a reinforcement learning artificial intelligence model built to play the GameBoy game, Metroid II: Return of Samus.__
 
-<!-- ## Checkout the YouTube video about the AI and the model breakdown
-<img alt="YouTube thumbnail" src="/assets/thumbnail.png" height="200"> <img alt="YouTube breakdown thumbnail" src="/assets/tb_thumbnail.png" height="200"> -->
-
 
 ## 👾 Getting Started 👾
 1. Clone this repo
@@ -31,6 +28,7 @@ mkdir ROMs
     * You also have to rename the file to ```Metroid2.gb```
 
 ## 🤖 Run Pretrained Model 🤖
+Note: The pretrained models I have are too large to host on GitHub, so you will need to train your own first.
 1. Enter ```src/``` directory
 ```
 cd src
